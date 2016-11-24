@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.reactnative.ivpusic.imagepicker">
+    package="com.reactnative.mg.imagepicker">
 
     <application>
 

@@ -1,4 +1,4 @@
-package com.reactnative.ivpusic.imagepicker;
+package com.reactnative.mg.imagepicker;
 
 import android.content.Context;
 import android.database.Cursor;

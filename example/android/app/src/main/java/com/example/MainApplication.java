@@ -7,7 +7,7 @@ import com.brentvatne.react.ReactVideoPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
-import com.reactnative.ivpusic.imagepicker.PickerPackage;
+import com.reactnative.mg.imagepicker.PickerPackage;
 
 import java.util.Arrays;
 import java.util.List;
