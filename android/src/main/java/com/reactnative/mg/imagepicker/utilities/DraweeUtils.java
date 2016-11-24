@@ -1,4 +1,4 @@
-package com.multiple_images_selector.utilities;
+package com.reactnative.mg.imagepicker.utilities;
 
 import android.net.Uri;
 

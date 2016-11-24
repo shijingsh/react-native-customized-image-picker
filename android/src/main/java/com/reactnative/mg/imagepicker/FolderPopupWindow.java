@@ -1,4 +1,4 @@
-package com.multiple_images_selector;
+package com.reactnative.mg.imagepicker;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.PopupWindow;
 
-import com.multiple_images_selector.models.FolderListContent;
+import com.reactnative.mg.imagepicker.models.FolderListContent;
 
 /**
  * Created by zfdang on 2016-4-16.

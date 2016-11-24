@@ -1,4 +1,4 @@
-package com.multiple_images_selector;
+package com.reactnative.mg.imagepicker;
 
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -9,10 +9,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.multiple_images_selector.models.ImageItem;
-import com.multiple_images_selector.models.ImageListContent;
-import com.multiple_images_selector.utilities.DraweeUtils;
-import com.multiple_images_selector.utilities.FileUtils;
+import com.reactnative.mg.imagepicker.models.ImageItem;
+import com.reactnative.mg.imagepicker.models.ImageListContent;
+import com.reactnative.mg.imagepicker.utilities.DraweeUtils;
+import com.reactnative.mg.imagepicker.utilities.FileUtils;
 
 import java.io.File;
 import java.util.List;

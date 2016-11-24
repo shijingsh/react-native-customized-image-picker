@@ -1,8 +1,8 @@
-package com.multiple_images_selector.models;
+package com.reactnative.mg.imagepicker.models;
 
 import android.util.Log;
 
-import com.multiple_images_selector.SelectorSettings;
+import com.reactnative.mg.imagepicker.SelectorSettings;
 
 public class ImageItem {
     private static final String TAG = "ImageItem";

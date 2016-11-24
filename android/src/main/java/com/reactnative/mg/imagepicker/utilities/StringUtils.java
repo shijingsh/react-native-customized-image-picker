@@ -1,4 +1,4 @@
-package com.multiple_images_selector.utilities;
+package com.reactnative.mg.imagepicker.utilities;
 
 /**
  * Created by zfdang on 2016-4-17.

@@ -1,4 +1,4 @@
-package com.multiple_images_selector.models;
+package com.reactnative.mg.imagepicker.models;
 
 import java.util.ArrayList;
 

@@ -1,7 +1,7 @@
-package com.multiple_images_selector;
+package com.reactnative.mg.imagepicker;
 
 
-import com.multiple_images_selector.models.ImageItem;
+import com.reactnative.mg.imagepicker.models.ImageItem;
 
 /**
  * Created by zfdang on 2016-4-12.

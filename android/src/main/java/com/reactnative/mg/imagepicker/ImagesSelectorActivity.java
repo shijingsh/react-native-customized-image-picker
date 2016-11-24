@@ -1,4 +1,4 @@
-package com.multiple_images_selector;
+package com.reactnative.mg.imagepicker;
 
 import android.Manifest;
 import android.app.Activity;
@@ -26,12 +26,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.multiple_images_selector.models.FolderItem;
-import com.multiple_images_selector.models.FolderListContent;
-import com.multiple_images_selector.models.ImageItem;
-import com.multiple_images_selector.models.ImageListContent;
-import com.multiple_images_selector.utilities.FileUtils;
-import com.multiple_images_selector.utilities.StringUtils;
+import com.reactnative.mg.imagepicker.models.FolderItem;
+import com.reactnative.mg.imagepicker.models.FolderListContent;
+import com.reactnative.mg.imagepicker.models.ImageItem;
+import com.reactnative.mg.imagepicker.models.ImageListContent;
+import com.reactnative.mg.imagepicker.utilities.FileUtils;
+import com.reactnative.mg.imagepicker.utilities.StringUtils;
 
 import java.io.File;
 import java.io.IOException;

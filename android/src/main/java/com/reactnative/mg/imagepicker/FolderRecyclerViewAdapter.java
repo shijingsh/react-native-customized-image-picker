@@ -1,4 +1,4 @@
-package com.multiple_images_selector;
+package com.reactnative.mg.imagepicker;
 
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -9,9 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.multiple_images_selector.models.FolderItem;
-import com.multiple_images_selector.models.FolderListContent;
-import com.multiple_images_selector.utilities.DraweeUtils;
+import com.reactnative.mg.imagepicker.models.FolderItem;
+import com.reactnative.mg.imagepicker.models.FolderListContent;
+import com.reactnative.mg.imagepicker.utilities.DraweeUtils;
 
 import java.io.File;
 import java.util.List;
