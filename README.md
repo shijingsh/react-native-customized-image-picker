@@ -1,11 +1,6 @@
-# react-native-image-crop-picker
+# react-native-customized-image-picker
 iOS/Android image picker with support for camera, video compression, multiple images and cropping
 
-## Result
-
-<img width=200 title="iOS Single Pick" src="https://github.com/ivpusic/react-native-image-crop-picker/blob/master/images/ios_single_pick.png">
-<img width=200 title="iOS Crop" src="https://github.com/ivpusic/react-native-image-crop-picker/blob/master/images/ios_crop.png">
-<img width=200 title="iOS Multiple Pick" src="https://github.com/ivpusic/react-native-image-crop-picker/blob/master/images/ios_multiple_pick.png">
 
 ## Usage
 

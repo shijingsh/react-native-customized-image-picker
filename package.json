@@ -4,8 +4,7 @@
   "description": "Select single or multiple images, with croping option",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublish": "rm -rf android/build"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -30,5 +29,9 @@
   "homepage": "https://github.com/liukefu2050/react-native-customized-image-picker#readme",
   "peerDependencies": {
     "react-native": ">=0.33.0"
+  },
+  "dependencies": {
+    "react": "15.3.1",
+    "react-native": "^0.36.1"
   }
 }
