@@ -17,4 +17,19 @@ android {
 dependencies {
     compile 'com.facebook.react:react-native:+'
     compile 'com.yalantis:ucrop:2.2.0-native'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.android.support:recyclerview-v7:23.3.0'
+    compile 'com.android.support:support-v4:23.3.0'
+    compile 'io.reactivex:rxjava:1.1.3'
+    compile 'io.reactivex:rxandroid:1.1.0'
+
+    compile 'com.facebook.fresco:fresco:0.10.0'
+    // For animated GIF support
+    compile 'com.facebook.fresco:animated-gif:0.10.0'
+    // For WebP support, including animated WebP
+    compile 'com.facebook.fresco:animated-webp:0.10.0'
+    compile 'com.facebook.fresco:webpsupport:0.10.0'
+
+    compile 'xyz.danoz:recyclerviewfastscroller:0.1.3'
 }
