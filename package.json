@@ -29,9 +29,5 @@
   "homepage": "https://github.com/liukefu2050/react-native-customized-image-picker#readme",
   "peerDependencies": {
     "react-native": ">=0.33.0"
-  },
-  "dependencies": {
-    "react": "15.3.1",
-    "react-native": "^0.36.1"
   }
 }
