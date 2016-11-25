@@ -81,8 +81,8 @@ ImagePicker.clean().then(() => {
 ## Install
 
 ```
-npm i react-native-image-crop-picker --save
-react-native link react-native-image-crop-picker
+npm i react-native-customized-image-picker --save
+react-native link react-native-customized-image-picker
 ```
 
 #### Post-install steps
@@ -117,7 +117,7 @@ react-native link react-native-image-crop-picker
 ###### non-cocoapods users
 
 If you are using pre-built frameworks from `ios/ImageCropPickerSDK`, then before deploying app to production you should strip off simulator ARCHs from these, or you can add frameworks from `Libraries/imageCropPicker/Libraries/_framework_name_.xcodeproj/Products/_framework_name_.framework` to Embedded Binaries instead of pre-built ones.
-Related issue: https://github.com/mg/react-native-image-crop-picker/issues/61.
+Related issue: https://github.com/mg/react-native-customized-image-picker/issues/61.
 
 Details for second approach:
 

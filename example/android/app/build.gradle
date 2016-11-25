@@ -127,7 +127,7 @@ android {
 
 dependencies {
     compile project(':react-native-video')
-    compile project(':react-native-image-crop-picker')
+    compile project(':react-native-customized-image-picker')
     compile fileTree(dir: "libs", include: ["*.jar"])
     compile "com.android.support:appcompat-v7:24.2.1"
     compile "com.facebook.react:react-native:+"
