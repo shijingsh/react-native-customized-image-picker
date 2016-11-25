@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/buttom_actionbar_height"
+                android:background="#21282C"
+                android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/selector_button_back"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:paddingLeft="12dp"
+        android:paddingRight="16dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_arrow_back_white_24dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/selector_button_back"
+        android:text="@string/selector_caption"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"/>
+
+    <Button
+        android:id="@+id/selector_button_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/action_btn"
+        android:minHeight="1dp"
+        android:minWidth="1dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:text="@string/selector_action_done"
+        android:textColor="@color/default_text_color"
+        android:textSize="14sp"/>
+
+</RelativeLayout>

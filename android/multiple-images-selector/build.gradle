@@ -1,0 +1,49 @@
+apply plugin: 'com.android.library'
+
+ext {
+    PUBLISH_GROUP_ID = 'com.zfdang.multiple-images-selector'
+    PUBLISH_ARTIFACT_ID = 'multiple-images-selector'
+    PUBLISH_VERSION = '1.1.3'
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.android.support:recyclerview-v7:23.3.0'
+    compile 'com.android.support:support-v4:23.3.0'
+    compile 'io.reactivex:rxjava:1.1.3'
+    compile 'io.reactivex:rxandroid:1.1.0'
+
+    compile 'com.facebook.fresco:fresco:0.10.0'
+    // For animated GIF support
+    compile 'com.facebook.fresco:animated-gif:0.10.0'
+    // For WebP support, including animated WebP
+    compile 'com.facebook.fresco:animated-webp:0.10.0'
+    compile 'com.facebook.fresco:webpsupport:0.10.0'
+
+    compile 'xyz.danoz:recyclerviewfastscroller:0.1.3'
+}
+
+// https://github.com/blundell/release-android-library
+// or use the remote copy to keep update with latest changes
+// ./gradlew clean build generateRelease
+apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
