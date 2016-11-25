@@ -41,6 +41,8 @@ dependencies {
     compile 'com.facebook.fresco:webpsupport:0.10.0'
 
     compile 'xyz.danoz:recyclerviewfastscroller:0.1.3'
+
+    compile 'com.zfdang.multiple-images-selector:multiple-images-selector:1.1.3'
 }
 
 // https://github.com/blundell/release-android-library
