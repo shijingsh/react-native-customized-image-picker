@@ -17,6 +17,10 @@
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <activity
+                android:name="com.zfdang.multiple_images_selector.ImagesSelectorActivity"
+                android:configChanges="orientation|screenSize"/>
     </application>
 
 </manifest>

@@ -43,6 +43,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
+import com.zfdang.multiple_images_selector.ImagesSelectorActivity;
+import com.zfdang.multiple_images_selector.SelectorSettings;
 class PickerModule extends ReactContextBaseJavaModule implements ActivityEventListener {
 
     private static final int IMAGE_PICKER_REQUEST = 61110;
@@ -296,20 +298,30 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
 
     private void initiatePicker(final Activity activity) {
         try {
-            final Intent galleryIntent = new Intent(Intent.ACTION_PICK);
+            Intent intent = new Intent(activity, ImagesSelectorActivity.class);
+            // max number of images to be selected
+            intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 5);
+            // min size of image which will be shown; to filter tiny images (mainly icons)
+            intent.putExtra(SelectorSettings.SELECTOR_MIN_IMAGE_SIZE, 100000);
+            // show camera or not
+            intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, false);
+            // pass current selected images as the initial value
+            intent.putStringArrayListExtra(SelectorSettings.SELECTOR_INITIAL_SELECTED_LIST, mResults);
+
+/*            final Intent galleryIntent = new Intent(Intent.ACTION_PICK);
 
             if (cropping) {
-                galleryIntent.setType("image/*");
+                galleryIntent.setType("image*//*");
             } else {
-                galleryIntent.setType("image/*,video/*");
+                galleryIntent.setType("image*//*,video*//*");
             }
 
             galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, multiple);
             galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
             galleryIntent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
 
-            final Intent chooserIntent = Intent.createChooser(galleryIntent, "Pick an image");
-            activity.startActivityForResult(chooserIntent, IMAGE_PICKER_REQUEST);
+            final Intent chooserIntent = Intent.createChooser(galleryIntent, "Pick an image");*/
+            activity.startActivityForResult(intent, IMAGE_PICKER_REQUEST);
         } catch (Exception e) {
             mPickerPromise.reject(E_FAILED_TO_SHOW_PICKER, e);
         }
