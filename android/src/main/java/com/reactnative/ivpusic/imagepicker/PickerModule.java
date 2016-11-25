@@ -1,4 +1,4 @@
-package com.reactnative.mg.imagepicker;
+package com.reactnative.ivpusic.imagepicker;
 
 import android.app.Activity;
 import android.content.ClipData;
@@ -88,7 +88,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
     }
 
     private String getTmpDir() {
-        String tmpDir = mReactContext.getCacheDir() + "/react-native-customized-image-picker";
+        String tmpDir = mReactContext.getCacheDir() + "/react-native-image-crop-picker";
         Boolean created = new File(tmpDir).mkdir();
 
         return tmpDir;
