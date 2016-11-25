@@ -1,4 +1,4 @@
-package com.reactnative.ivpusic.imagepicker;
+package com.reactnative.mg.imagepicker;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
