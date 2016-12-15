@@ -1,1 +1,3 @@
-include ':multiple-images-selector'
+rootProject.name = 'imagepicker'
+
+include ':app'
