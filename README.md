@@ -42,7 +42,7 @@ ImagePicker.openPicker({
 | height      | number      | Height of result image when used with `cropping` option |
 | multiple | bool (default false) | Enable or disable multiple image selection |
 | isCamera | bool (default false) | Enable or disable camera selection |
-| maxSize  | int (default 9) | set image count |
+| maxSize  | number (default 9) | set image count |
 
 #### Response Object
 
