@@ -65,7 +65,7 @@ react-native link react-native-customized-image-picker
 #### Post-install steps
 
 ##### iOS
-native for ios not Modified; 
+native for ios not modified; 
 please see : https://github.com/ivpusic/react-native-image-crop-picker
 
 ## How it works?

@@ -128,7 +128,7 @@ class PickerModule extends ReactContextBaseJavaModule {
             rxGalleryFinal.hideCamera();
         }
         if(!this.multiple) {
-            if(!cropping){
+            if(cropping){
                 rxGalleryFinal.crop();
             }
             rxGalleryFinal
