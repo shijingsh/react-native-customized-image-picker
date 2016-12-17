@@ -5,7 +5,7 @@ iOS/Android image picker with support for camera, video compression, multiple im
 ## Usage
 can user version
 ```
-version >= 0.0.17
+version >= 0.0.19
 ```
 
 Import library
@@ -41,6 +41,8 @@ ImagePicker.openPicker({
 | width          | number | Width of result image when used with `cropping` option |
 | height      | number      | Height of result image when used with `cropping` option |
 | multiple | bool (default false) | Enable or disable multiple image selection |
+| isCamera | bool (default false) | Enable or disable camera selection |
+| maxSize  | int (default 9) | set image count |
 
 #### Response Object
 
