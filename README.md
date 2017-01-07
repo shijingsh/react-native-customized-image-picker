@@ -2,7 +2,7 @@
 iOS/Android image picker with support for camera, video compression, multiple images and cropping
 
 ## Result
-<img width=200 title="Multiple Pick" src="https://github.com/liukefu2050/react-native-customized-image-picker/tree/master/images/pic.png">
+<img width=200 title="Multiple Pick" src="https://github.com/liukefu2050/react-native-customized-image-picker/blob/master/images/pic.png">
 
 
 ## Usage
