@@ -2,6 +2,7 @@ package com.mg.app;
 
 import android.app.Activity;
 import android.graphics.BitmapFactory;
+import android.util.Base64;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -17,7 +18,12 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import cn.finalteam.rxgalleryfinal.RxGalleryFinal;
@@ -36,6 +42,7 @@ class PickerModule extends ReactContextBaseJavaModule {
     private boolean cropping = false;
     private boolean multiple = false;
     private boolean isCamera = false;
+    private boolean includeBase64 = false;
     //Light Blue 500
     private int width = 200;
     private int height = 200;
@@ -59,6 +66,7 @@ class PickerModule extends ReactContextBaseJavaModule {
         height = options.hasKey("height") ? options.getInt("height") : height;
         maxSize = options.hasKey("maxSize") ? options.getInt("maxSize") : maxSize;
         cropping = options.hasKey("cropping") ? options.getBoolean("cropping") : cropping;
+        includeBase64 = options.hasKey("includeBase64") && options.getBoolean("includeBase64");
     }
 
     private WritableMap getImage(String path) throws Exception {
@@ -82,9 +90,9 @@ class PickerModule extends ReactContextBaseJavaModule {
         image.putString("mime", options.outMimeType);
         image.putInt("size", (int) new File(path).length());
 
-/*        if (includeBase64) {
+        if (includeBase64) {
             image.putString("data", getBase64StringFromFile(path));
-        }*/
+        }
 
         return image;
     }
@@ -168,5 +176,32 @@ class PickerModule extends ReactContextBaseJavaModule {
                     })
                     .openGallery();
         }
+    }
+
+    private String getBase64StringFromFile(String absoluteFilePath) {
+        InputStream inputStream;
+
+        try {
+            inputStream = new FileInputStream(new File(absoluteFilePath));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        byte[] bytes;
+        byte[] buffer = new byte[8192];
+        int bytesRead;
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        try {
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                output.write(buffer, 0, bytesRead);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        bytes = output.toByteArray();
+        return Base64.encodeToString(bytes, Base64.NO_WRAP);
     }
 }
