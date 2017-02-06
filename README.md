@@ -41,12 +41,13 @@ ImagePicker.openPicker({
 | Property        | Type           | Description  |
 | ------------- |:-------------:| :-----|
 | cropping | bool (default false)      | Enable or disable cropping |
-| width          | number | Width of result image when used with `cropping` option |
-| height      | number      | Height of result image when used with `cropping` option |
+| width       | number(default 200) | Width of result image when used with `cropping` option |
+| height      | number(default 200) | Height of result image when used with `cropping` option |
 | multiple | bool (default false) | Enable or disable multiple image selection |
 | isCamera | bool (default false) | Enable or disable camera selection |
 | maxSize  | number (default 9) | set image count |
 | includeBase64 | bool (default false) | Enable or disable includeBase64 |
+| compressQuality  | number([0-100]) | Picture compression ratio |
 #### Response Object
 
 | Property        | Type           | Description  |

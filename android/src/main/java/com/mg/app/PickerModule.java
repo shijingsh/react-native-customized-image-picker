@@ -47,6 +47,7 @@ class PickerModule extends ReactContextBaseJavaModule {
     private int width = 200;
     private int height = 200;
     private int maxSize = 9;
+    private int compressQuality = -1;
     private final ReactApplicationContext mReactContext;
 
     PickerModule(ReactApplicationContext reactContext) {
@@ -67,6 +68,7 @@ class PickerModule extends ReactContextBaseJavaModule {
         maxSize = options.hasKey("maxSize") ? options.getInt("maxSize") : maxSize;
         cropping = options.hasKey("cropping") ? options.getBoolean("cropping") : cropping;
         includeBase64 = options.hasKey("includeBase64") && options.getBoolean("includeBase64");
+        compressQuality = options.hasKey("compressQuality") ? options.getInt("compressQuality") : compressQuality;
     }
 
     private WritableMap getImage(String path) throws Exception {
@@ -135,9 +137,13 @@ class PickerModule extends ReactContextBaseJavaModule {
         if(!isCamera){
             rxGalleryFinal.hideCamera();
         }
+        if(compressQuality>0){
+            rxGalleryFinal.cropropCompressionQuality(compressQuality);
+        }
         if(!this.multiple) {
             if(cropping){
                 rxGalleryFinal.crop();
+                rxGalleryFinal.cropMaxResultSize(this.width,this.height);
             }
             rxGalleryFinal
                     .image()
