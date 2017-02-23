@@ -72,6 +72,20 @@ react-native link react-native-customized-image-picker
 native for ios not modified; 
 please see : https://github.com/ivpusic/react-native-image-crop-picker
 
+In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` with value that describes why do you need access to user photos. More info here https://forums.developer.apple.com/thread/62229. Depending on what features you use, you also may need `NSCameraUsageDescription` and `NSMicrophoneUsageDescription` keys.
+
+###### cocoapods users
+
+- Add `platform :ios, '8.0'` to Podfile (!important)
+- Add `pod 'RSKImageCropper'` and `pod 'QBImagePickerController'` to Podfile
+
+###### non-cocoapods users
+
+- Drag and drop the ios/ImageCropPickerSDK folder to your xcode project. (Make sure Copy items if needed IS ticked)
+- Click on project General tab
+  - Under `Deployment Info` set `Deployment Target` to `8.0`
+  - Under `Embedded Binaries` click `+` and add `RSKImageCropper.framework` and `QBImagePicker.framework`
+
 ## How it works?
 
 It is basically wrapper around few libraries
