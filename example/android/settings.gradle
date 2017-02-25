@@ -5,4 +5,4 @@ include ':react-native-video'
 project(':react-native-video').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-video/android')
 
 include ':react-native-customized-image-picker'
-project(':react-native-customized-image-picker').projectDir = new File(settingsDir, '../../android')
+project(':react-native-customized-image-picker').projectDir = new File(settingsDir, '../node_modules/react-native-customized-image-picker/android')

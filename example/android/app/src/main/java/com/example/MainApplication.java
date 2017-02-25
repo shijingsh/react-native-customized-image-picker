@@ -7,7 +7,7 @@ import com.brentvatne.react.ReactVideoPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
-import com.reactnative.mg.imagepicker.PickerPackage;
+import com.mg.app.PickerPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +24,7 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
                     new MainReactPackage(),
-            new ReactVideoPackage(),
+                    new ReactVideoPackage(),
                     new PickerPackage()
             );
         }

@@ -6,9 +6,9 @@
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },
   "dependencies": {
-    "react": "^15.3.2",
+    "react": "^15.3.1",
     "react-native": "^0.37.0",
-    "react-native-customized-image-picker": "../",
+    "react-native-customized-image-picker": "0.0.24",
     "react-native-video": "^0.9.0"
   }
 }
