@@ -43,6 +43,7 @@ class PickerModule extends ReactContextBaseJavaModule {
     private boolean multiple = false;
     private boolean isCamera = false;
     private boolean includeBase64 = false;
+    private boolean openCameraOnStart = false;
     //Light Blue 500
     private int width = 200;
     private int height = 200;
@@ -63,6 +64,7 @@ class PickerModule extends ReactContextBaseJavaModule {
     private void setConfiguration(final ReadableMap options) {
         multiple = options.hasKey("multiple") && options.getBoolean("multiple");
         isCamera = options.hasKey("isCamera") && options.getBoolean("isCamera");
+        openCameraOnStart = options.hasKey("openCameraOnStart") && options.getBoolean("openCameraOnStart");
         width = options.hasKey("width") ? options.getInt("width") : width;
         height = options.hasKey("height") ? options.getInt("height") : height;
         maxSize = options.hasKey("maxSize") ? options.getInt("maxSize") : maxSize;
@@ -134,7 +136,9 @@ class PickerModule extends ReactContextBaseJavaModule {
         mPickerPromise = promise;
 
         RxGalleryFinal rxGalleryFinal =  RxGalleryFinal.with(activity);
-        if(!isCamera){
+        if(openCameraOnStart){
+            rxGalleryFinal.openCameraOnStart();
+        }else if(!isCamera){
             rxGalleryFinal.hideCamera();
         }
         if(compressQuality>0){

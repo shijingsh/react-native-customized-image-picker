@@ -45,6 +45,7 @@ ImagePicker.openPicker({
 | height      | number(default 200) | Height of result image when used with `cropping` option |
 | multiple | bool (default false) | Enable or disable multiple image selection |
 | isCamera | bool (default false) | Enable or disable camera selection |
+| openCameraOnStart | bool (default false) | Enable or disable turn on the camera when it starts |
 | maxSize  | number (default 9) | set image count |
 | includeBase64 | bool (default false) | Enable or disable includeBase64 |
 | compressQuality  | number([0-100]) | Picture compression ratio |
@@ -91,8 +92,8 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
 It is basically wrapper around few libraries
 
 #### Android
-- RxGalleryFinal: https://github.com/FinalTeam/RxGalleryFinal
-
+- RxGalleryFinal: https://github.com/liukefu2050/RxGalleryFinal  
+                  forked from  https://github.com/FinalTeam/RxGalleryFinal
 #### iOS
 - QBImagePickerController
 - RSKImageCropper
