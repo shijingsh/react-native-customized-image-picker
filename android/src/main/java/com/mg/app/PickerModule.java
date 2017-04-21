@@ -1,6 +1,7 @@
 package com.mg.app;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 
@@ -51,6 +52,8 @@ class PickerModule extends ReactContextBaseJavaModule {
     private int compressQuality = -1;
     private final ReactApplicationContext mReactContext;
 
+    private Compression compression = new Compression();
+    private ReadableMap options;
     PickerModule(ReactApplicationContext reactContext) {
         super(reactContext);
         mReactContext = reactContext;
@@ -71,45 +74,45 @@ class PickerModule extends ReactContextBaseJavaModule {
         cropping = options.hasKey("cropping") ? options.getBoolean("cropping") : cropping;
         includeBase64 = options.hasKey("includeBase64") && options.getBoolean("includeBase64");
         compressQuality = options.hasKey("compressQuality") ? options.getInt("compressQuality") : compressQuality;
+
+        this.options = options;
     }
 
-    private WritableMap getImage(String path) throws Exception {
+    private WritableMap getImage(final Activity activity,String path) throws Exception {
         WritableMap image = new WritableNativeMap();
         if (path.startsWith("http://") || path.startsWith("https://")) {
             throw new Exception("Cannot select remote files");
         }
+        validateImage(path);
 
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
+        // if compression options are provided image will be compressed. If none options is provided,
+        // then original image will be returned
+        File compressedImage = compression.compressImage(activity, options, path);
+        String compressedImagePath = compressedImage.getPath();
+        BitmapFactory.Options options = validateImage(compressedImagePath);
 
-        BitmapFactory.decodeFile(path, options);
-
-        if (options.outMimeType == null || options.outWidth == 0 || options.outHeight == 0) {
-            throw new Exception("Invalid image selected");
-        }
-
-        image.putString("path", "file://" + path);
+        image.putString("path", "file://" + compressedImagePath);
         image.putInt("width", options.outWidth);
         image.putInt("height", options.outHeight);
         image.putString("mime", options.outMimeType);
-        image.putInt("size", (int) new File(path).length());
+        image.putInt("size", (int) new File(compressedImagePath).length());
 
         if (includeBase64) {
-            image.putString("data", getBase64StringFromFile(path));
+            image.putString("data", getBase64StringFromFile(compressedImagePath));
         }
 
         return image;
     }
 
-    private WritableMap getImage(ImageCropBean result) throws Exception {
+    private WritableMap getImage(final Activity activity, ImageCropBean result) throws Exception {
 
         String path = result.getOriginalPath();
-        return getImage(path);
+        return getImage(activity,path);
     }
-    private WritableMap getImage(MediaBean result) throws Exception {
+    private WritableMap getImage(final Activity activity,MediaBean result) throws Exception {
 
         String path = result.getOriginalPath();
-        return getImage(path);
+        return getImage(activity,path);
     }
     private void initImageLoader(Activity activity) {
 
@@ -159,7 +162,7 @@ class PickerModule extends ReactContextBaseJavaModule {
                             //Toast.makeText(getBaseContext(), imageRadioResultEvent.getResult().getOriginalPath(), Toast.LENGTH_SHORT).show();
                             ImageCropBean result = imageRadioResultEvent.getResult();
                             WritableArray resultArr = new WritableNativeArray();
-                            resultArr.pushMap(getImage(result));
+                            resultArr.pushMap(getImage(activity,result));
                             mPickerPromise.resolve(resultArr);
                         }
                     })
@@ -177,7 +180,7 @@ class PickerModule extends ReactContextBaseJavaModule {
                             List<MediaBean> list = imageMultipleResultEvent.getResult();
                             WritableArray resultArr = new WritableNativeArray();
                             for(MediaBean bean:list){
-                                resultArr.pushMap(getImage(bean));
+                                resultArr.pushMap(getImage(activity,bean));
                             }
                             mPickerPromise.resolve(resultArr);
 
@@ -213,5 +216,21 @@ class PickerModule extends ReactContextBaseJavaModule {
 
         bytes = output.toByteArray();
         return Base64.encodeToString(bytes, Base64.NO_WRAP);
+    }
+
+
+    private BitmapFactory.Options validateImage(String path) throws Exception {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        options.inDither = true;
+
+        BitmapFactory.decodeFile(path, options);
+
+        if (options.outMimeType == null || options.outWidth == 0 || options.outHeight == 0) {
+            throw new Exception("Invalid image selected");
+        }
+
+        return options;
     }
 }
