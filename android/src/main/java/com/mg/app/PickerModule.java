@@ -45,6 +45,8 @@ class PickerModule extends ReactContextBaseJavaModule {
     private boolean isCamera = false;
     private boolean includeBase64 = false;
     private boolean openCameraOnStart = false;
+    private boolean returnAfterShot = false;
+    private String title = null;
     //Light Blue 500
     private int width = 200;
     private int height = 200;
@@ -74,7 +76,8 @@ class PickerModule extends ReactContextBaseJavaModule {
         cropping = options.hasKey("cropping") ? options.getBoolean("cropping") : cropping;
         includeBase64 = options.hasKey("includeBase64") && options.getBoolean("includeBase64");
         compressQuality = options.hasKey("compressQuality") ? options.getInt("compressQuality") : compressQuality;
-
+        title = options.hasKey("title") ? options.getString("title") : title;
+        returnAfterShot = options.hasKey("returnAfterShot") && options.getBoolean("returnAfterShot");
         this.options = options;
     }
 
@@ -146,6 +149,12 @@ class PickerModule extends ReactContextBaseJavaModule {
         }
         if(compressQuality>0){
             rxGalleryFinal.cropropCompressionQuality(compressQuality);
+        }
+        if(title != null){
+            rxGalleryFinal.setTitle(title);
+        }
+        if(returnAfterShot){
+            rxGalleryFinal.returnAfterShot();
         }
         if(!this.multiple) {
             if(cropping){

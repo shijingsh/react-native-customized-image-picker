@@ -46,9 +46,11 @@ ImagePicker.openPicker({
 | multiple | bool (default false) | Enable or disable multiple image selection |
 | isCamera | bool (default false) | Enable or disable camera selection |
 | openCameraOnStart | bool (default false) | Enable or disable turn on the camera when it starts |
+| returnAfterShot | bool (default false) | Enable or disable pictures taken directly |
 | maxSize  | number (default 9) | set image count |
 | includeBase64 | bool (default false) | Enable or disable includeBase64 |
 | compressQuality  | number([0-100]) | Picture compression ratio |
+| title  | string | Sets the title of the page |
 #### Response Object
 
 | Property        | Type           | Description  |
@@ -97,6 +99,12 @@ It is basically wrapper around few libraries
 #### iOS
 - QBImagePickerController
 - RSKImageCropper
+
+## Update log
+
+#### 0.0.29
+- 增加returnAfterShot和title参数
+- 图片选择过滤临时目录
 
 ## License
 *MIT*
