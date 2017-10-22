@@ -30,7 +30,6 @@ export default class App extends Component {
   constructor() {
     super();
     this.state = {
-      image: null,
       images: null
     };
   }
@@ -41,11 +40,12 @@ export default class App extends Component {
       height: 300,
       cropping: cropit,
       includeBase64: true
-    }).then(image => {
-      console.log('received image', image);
+    }).then(images => {
       this.setState({
-        image: {uri: `data:${image.mime};base64,`+ image.data, width: image.width, height: image.height},
-        images: null
+          images: images.map(i => {
+              console.log('received image', i);
+              return {uri: i.path, width: i.width, height: i.height, mime: i.mime};
+          })
       });
     }).catch(e => alert(e));
   }
@@ -56,12 +56,13 @@ export default class App extends Component {
       height: 300,
       cropping: cropit,
       compressVideo: true
-    }).then(image => {
-      console.log('received image', image);
-      this.setState({
-        image: {uri: image.path, width: image.width, height: image.height, mime: image.mime},
-        images: null
-      });
+    }).then(images => {
+        this.setState({
+            images: images.map(i => {
+                console.log('received image', i);
+                return {uri: i.path, width: i.width, height: i.height, mime: i.mime};
+            })
+        });
     }).catch(e => {
       console.log(e.code);
       alert(e);
@@ -73,7 +74,6 @@ export default class App extends Component {
       multiple: true
     }).then(images => {
       this.setState({
-        image: null,
         images: images.map(i => {
           console.log('received image', i);
           return {uri: i.path, width: i.width, height: i.height, mime: i.mime};
