@@ -94,8 +94,8 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.2.1"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
         applicationId "com.example"
@@ -140,7 +140,7 @@ dependencies {
     compile project(':react-native-video')
     compile project(':react-native-customized-image-picker')
     compile fileTree(dir: "libs", include: ["*.jar"])
-    compile "com.android.support:appcompat-v7:24.2.1"
+    compile "com.android.support:appcompat-v7:25.0.3"
     compile "com.facebook.react:react-native:+"
 }
 
