@@ -2,8 +2,11 @@
 iOS/Android image picker with support for camera, video compression, multiple images and cropping
 
 ## Result
-<img width=200 title="Multiple Pick" src="https://github.com/liukefu2050/react-native-customized-image-picker/blob/master/images/pic.png">
 
+<p align="left">
+<img width=200 title="Multiple Pick" src="https://github.com/liukefu2050/react-native-customized-image-picker/blob/master/images/pic.png">
+<img width=200 title="video Pick" src="https://github.com/liukefu2050/react-native-customized-image-picker/blob/master/images/pic2.png">
+</p>
 
 ## Usage
 use version
@@ -75,6 +78,16 @@ react-native link react-native-customized-image-picker
 ```
 
 #### Post-install steps
+
+##### android
+
+in AndroidManifest.xml add follow:
+
+```html
+        <uses-feature android:name="android.hardware.camera" android:required="true"/>
+        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+```
 
 ##### iOS
 native for ios not modified; 
