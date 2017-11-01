@@ -51,6 +51,11 @@ ImagePicker.openPicker({
 | includeBase64 | bool (default false) | Enable or disable includeBase64 |
 | compressQuality  | number([0-100]) | Picture compression ratio |
 | title  | string | Sets the title of the page |
+| isVideo | bool (default false)      | Enable or disable video only | 
+| isHidePreview | bool (default false)      | Enable or disable hidden preview button | 
+| isHideVideoPreview | bool (default false)      | Enable or disable hidden video preview button | 
+| isPlayGif | bool (default false)      | Enable or disable play gif | 
+| imageLoader | string (default "GLIDE")      | Sets the imageLoader of the page,enum(PICASSO,GLIDE,FRESCO,UNIVERSAL) | 
 #### Response Object
 
 | Property        | Type           | Description  |
@@ -101,6 +106,11 @@ It is basically wrapper around few libraries
 - RSKImageCropper
 
 ## Update log
+
+#### 0.0.30
+- RxGalleryFinal  upgrade
+- add param
+- fixed bug
 
 #### 0.0.29
 - 增加returnAfterShot和title参数

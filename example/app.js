@@ -55,7 +55,7 @@ export default class App extends Component {
       width: 300,
       height: 300,
       cropping: cropit,
-      compressVideo: true
+      isCamera:true
     }).then(images => {
         this.setState({
             images: images.map(i => {
@@ -69,8 +69,47 @@ export default class App extends Component {
     });
   }
 
-  pickMultiple() {
+    pickSingleVideo(cropit) {
+        ImagePicker.openPicker({
+            width: 300,
+            height: 300,
+            isVideo:true,
+            isCamera:true,
+            cropping: cropit
+        }).then(images => {
+            this.setState({
+                images: images.map(i => {
+                    console.log('received image', i);
+                    return {uri: i.path, width: i.width, height: i.height, mime: i.mime};
+                })
+            });
+        }).catch(e => {
+            console.log(e.code);
+            alert(e);
+        });
+    }
+
+    pickSingleAndCamera() {
+        ImagePicker.openPicker({
+            isCamera:true,
+            openCameraOnStart:true,
+            returnAfterShot:true
+        }).then(images => {
+            this.setState({
+                images: images.map(i => {
+                    console.log('received image', i);
+                    return {uri: i.path, width: i.width, height: i.height, mime: i.mime};
+                })
+            });
+        }).catch(e => {
+            console.log(e.code);
+            alert(e);
+        });
+    }
+
+    pickMultiple() {
     ImagePicker.openPicker({
+      isCamera:true,
       multiple: true
     }).then(images => {
       this.setState({
@@ -122,18 +161,23 @@ export default class App extends Component {
   render() {
     return <View style={styles.container}>
       <ScrollView>
-        {this.state.image ? this.renderAsset(this.state.image) : null}
         {this.state.images ? this.state.images.map(i => <View key={i.uri}>{this.renderAsset(i)}</View>) : null}
       </ScrollView>
 
       <TouchableOpacity onPress={() => this.pickSingle(false)} style={styles.button}>
         <Text style={styles.text}>Select Single</Text>
       </TouchableOpacity>
+        <TouchableOpacity onPress={() => this.pickSingleVideo(false)} style={styles.button}>
+            <Text style={styles.text}>Select Single video</Text>
+        </TouchableOpacity>
       <TouchableOpacity onPress={() => this.pickSingleBase64(false)} style={styles.button}>
         <Text style={styles.text}>Select Single Returning Base64</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => this.pickSingle(true)} style={styles.button}>
         <Text style={styles.text}>Select Single With Cropping</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => this.pickSingleAndCamera()} style={styles.button}>
+        <Text style={styles.text}>Select Single With Camera</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={this.pickMultiple.bind(this)} style={styles.button}>
         <Text style={styles.text}>Select Multiple</Text>

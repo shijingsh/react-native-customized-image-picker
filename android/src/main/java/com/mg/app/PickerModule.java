@@ -3,7 +3,10 @@ package com.mg.app;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.util.Base64;
+import android.webkit.MimeTypeMap;
+import android.widget.Toast;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -31,9 +34,11 @@ import cn.finalteam.rxgalleryfinal.RxGalleryFinal;
 import cn.finalteam.rxgalleryfinal.bean.ImageCropBean;
 import cn.finalteam.rxgalleryfinal.bean.MediaBean;
 import cn.finalteam.rxgalleryfinal.imageloader.ImageLoaderType;
-import cn.finalteam.rxgalleryfinal.rxbus.RxBusResultSubscriber;
+import cn.finalteam.rxgalleryfinal.rxbus.RxBusResultDisposable;
 import cn.finalteam.rxgalleryfinal.rxbus.event.ImageMultipleResultEvent;
 import cn.finalteam.rxgalleryfinal.rxbus.event.ImageRadioResultEvent;
+import cn.finalteam.rxgalleryfinal.ui.RxGalleryListener;
+import cn.finalteam.rxgalleryfinal.ui.base.IRadioImageCheckedListener;
 
 class PickerModule extends ReactContextBaseJavaModule {
     private static final String E_ACTIVITY_DOES_NOT_EXIST = "E_ACTIVITY_DOES_NOT_EXIST";
@@ -45,13 +50,18 @@ class PickerModule extends ReactContextBaseJavaModule {
     private boolean isCamera = false;
     private boolean includeBase64 = false;
     private boolean openCameraOnStart = false;
-    private boolean returnAfterShot = false;
+    private boolean isVideo = false;
+    private boolean isHidePreview = false;
+    private boolean isPlayGif = false;
+    private boolean isHideVideoPreview = false;
     private String title = null;
+    private String imageLoader = null;
     //Light Blue 500
     private int width = 200;
     private int height = 200;
     private int maxSize = 9;
     private int compressQuality = -1;
+    private boolean returnAfterShot = false;
     private final ReactApplicationContext mReactContext;
 
     private Compression compression = new Compression();
@@ -78,7 +88,56 @@ class PickerModule extends ReactContextBaseJavaModule {
         compressQuality = options.hasKey("compressQuality") ? options.getInt("compressQuality") : compressQuality;
         title = options.hasKey("title") ? options.getString("title") : title;
         returnAfterShot = options.hasKey("returnAfterShot") && options.getBoolean("returnAfterShot");
+        isVideo = options.hasKey("isVideo") && options.getBoolean("isVideo");
+        isHidePreview = options.hasKey("isHidePreview") && options.getBoolean("isHidePreview");
+        isHideVideoPreview = options.hasKey("isHideVideoPreview") && options.getBoolean("isHideVideoPreview");
+        isPlayGif = options.hasKey("isPlayGif") && options.getBoolean("isPlayGif");
+
+        imageLoader = options.hasKey("imageLoader") ? options.getString("imageLoader") : imageLoader;
         this.options = options;
+    }
+
+    private static String getMimeType(String url) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (extension != null) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+
+        return type;
+    }
+
+    private WritableMap getAsyncSelection(final Activity activity,String path) throws Exception {
+        String mime = getMimeType(path);
+        if (mime != null && mime.startsWith("video/")) {
+          return  getVideo(activity, path, mime);
+        }
+
+        return getImage(activity,path);
+    }
+
+    private WritableMap getAsyncSelection(final Activity activity, ImageCropBean result) throws Exception {
+
+        String path = result.getOriginalPath();
+        return getAsyncSelection(activity,path);
+    }
+    private WritableMap getAsyncSelection(final Activity activity,MediaBean result) throws Exception {
+
+        String path = result.getOriginalPath();
+        return getAsyncSelection(activity,path);
+    }
+
+    private WritableMap getVideo(Activity activity, String path, String mime) throws Exception {
+        Bitmap bmp = validateVideo(path);
+
+        WritableMap video = new WritableNativeMap();
+        video.putInt("width", bmp.getWidth());
+        video.putInt("height", bmp.getHeight());
+        video.putString("mime", mime);
+        video.putInt("size", (int) new File(path).length());
+        video.putString("path", "file://" + path);
+
+        return video;
     }
 
     private WritableMap getImage(final Activity activity,String path) throws Exception {
@@ -156,44 +215,98 @@ class PickerModule extends ReactContextBaseJavaModule {
         if(returnAfterShot){
             rxGalleryFinal.returnAfterShot();
         }
+        if(isVideo){
+            rxGalleryFinal.video();
+        }else {
+            rxGalleryFinal.image();
+        }
+        if(isHidePreview){
+            rxGalleryFinal.hidePreview();
+        }
+        if (isHideVideoPreview){
+            rxGalleryFinal.videoPreview();
+        }
+        if(isPlayGif){
+            rxGalleryFinal.gif();
+        }
+        if (imageLoader != null){
+            switch (imageLoader){
+                case "PICASSO":
+                    rxGalleryFinal.imageLoader(ImageLoaderType.PICASSO);
+                    break;
+                case "GLIDE":
+                    rxGalleryFinal.imageLoader(ImageLoaderType.GLIDE);
+                    break;
+                case "FRESCO":
+                    rxGalleryFinal.imageLoader(ImageLoaderType.FRESCO);
+                    break;
+                case "UNIVERSAL":
+                    rxGalleryFinal.imageLoader(ImageLoaderType.UNIVERSAL);
+                    break;
+                default:
+                    break;
+            }
+        }else{
+            rxGalleryFinal.imageLoader(ImageLoaderType.GLIDE);
+        }
         if(!this.multiple) {
             if(cropping){
                 rxGalleryFinal.crop();
                 rxGalleryFinal.cropMaxResultSize(this.width,this.height);
+                //裁剪图片的回调
+                RxGalleryListener
+                        .getInstance()
+                        .setRadioImageCheckedListener(
+                                new IRadioImageCheckedListener() {
+                                    @Override
+                                    public void cropAfter(Object t) {
+                                        WritableArray resultArr = new WritableNativeArray();
+                                        try {
+                                            resultArr.pushMap(getAsyncSelection(activity,t.toString()));
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                        mPickerPromise.resolve(resultArr);
+                                    }
+
+                                    @Override
+                                    public boolean isActivityFinish() {
+                                        return true;
+                                    }
+                                });
             }
             rxGalleryFinal
-                    .image()
                     .radio()
-                    .imageLoader(ImageLoaderType.GLIDE)
-                    .subscribe(new RxBusResultSubscriber<ImageRadioResultEvent>() {
+                    .subscribe(new RxBusResultDisposable<ImageRadioResultEvent>() {
                         @Override
                         protected void onEvent(ImageRadioResultEvent imageRadioResultEvent) throws Exception {
-                            //Toast.makeText(getBaseContext(), imageRadioResultEvent.getResult().getOriginalPath(), Toast.LENGTH_SHORT).show();
-                            ImageCropBean result = imageRadioResultEvent.getResult();
-                            WritableArray resultArr = new WritableNativeArray();
-                            resultArr.pushMap(getImage(activity,result));
-                            mPickerPromise.resolve(resultArr);
+                            if(!cropping){
+                                ImageCropBean result = imageRadioResultEvent.getResult();
+                                WritableArray resultArr = new WritableNativeArray();
+                                resultArr.pushMap(getAsyncSelection(activity,result));
+                                mPickerPromise.resolve(resultArr);
+                            }
                         }
                     })
                     .openGallery();
         } else {
             rxGalleryFinal
-                    .image()
                     .multiple()
                     .maxSize(maxSize)
-                    .imageLoader(ImageLoaderType.GLIDE)
-                    .subscribe(new RxBusResultSubscriber<ImageMultipleResultEvent>() {
+                    .subscribe(new RxBusResultDisposable<ImageMultipleResultEvent>() {
                         @Override
                         protected void onEvent(ImageMultipleResultEvent imageMultipleResultEvent) throws Exception {
-                            //Toast.makeText(getBaseContext(), "已选择" + imageMultipleResultEvent.getResult().size() +"张图片", Toast.LENGTH_SHORT).show();
                             List<MediaBean> list = imageMultipleResultEvent.getResult();
                             WritableArray resultArr = new WritableNativeArray();
                             for(MediaBean bean:list){
-                                resultArr.pushMap(getImage(activity,bean));
+                                resultArr.pushMap(getAsyncSelection(activity,bean));
                             }
                             mPickerPromise.resolve(resultArr);
+                        }
 
-                            mPickerPromise.resolve(list);
+                        @Override
+                        public void onComplete() {
+                            super.onComplete();
                         }
                     })
                     .openGallery();
@@ -241,5 +354,17 @@ class PickerModule extends ReactContextBaseJavaModule {
         }
 
         return options;
+    }
+
+    private Bitmap validateVideo(String path) throws Exception {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(path);
+        Bitmap bmp = retriever.getFrameAtTime();
+
+        if (bmp == null) {
+            throw new Exception("Cannot retrieve video data");
+        }
+
+        return bmp;
     }
 }
