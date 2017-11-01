@@ -31,11 +31,14 @@
 
 - (ImageResult*) compressImageDimensions:(UIImage*)image
                              withOptions:(NSDictionary*)options {
-    NSNumber *maxWidth = [options valueForKey:@"width"];
-    NSNumber *maxHeight = [options valueForKey:@"height"];
+    NSNumber *maxWidth = [options valueForKey:@"compressImageMaxWidth"];
+    NSNumber *maxHeight = [options valueForKey:@"compressImageMaxHeight"];
     ImageResult *result = [[ImageResult alloc] init];
-    
-    if ([maxWidth integerValue] == 0 || [maxWidth integerValue] == 0) {
+                                
+    //[origin] if ([maxWidth integerValue] == 0 || [maxHeight integerValue] == 0) {
+    //when pick a width< height image and only set "compressImageMaxWidth",will cause a {0,0}size image
+    //Now fix it                       
+    if ([maxWidth integerValue] == 0 || [maxHeight integerValue] == 0) {
         result.width = [NSNumber numberWithFloat:image.size.width];
         result.height = [NSNumber numberWithFloat:image.size.height];
         result.image = image;
@@ -66,9 +69,9 @@
                    withOptions:(NSDictionary*)options {
     ImageResult *result = [self compressImageDimensions:image withOptions:options];
     
-    NSNumber *compressQuality = [options valueForKey:@"compressQuality"];
+    NSNumber *compressQuality = [options valueForKey:@"compressImageQuality"];
     if (compressQuality == nil) {
-        compressQuality = [NSNumber numberWithFloat:100];
+        compressQuality = [NSNumber numberWithFloat:1];
     }
     
     result.data = UIImageJPEGRepresentation(result.image, [compressQuality floatValue]);
