@@ -6,7 +6,7 @@ import {
 
 import Video from 'react-native-video';
 
-var ImagePicker = NativeModules.ImageCropPicker;
+import ImagePicker from 'react-native-customized-image-picker';
 
 const styles = StyleSheet.create({
   container: {
