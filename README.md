@@ -88,10 +88,46 @@ in AndroidManifest.xml add follow:
         <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
         <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 ```
+### iOS
+    thinks to : https://github.com/ivpusic/react-native-image-crop-picker
+#### Step 1:
 
-##### iOS
-native for ios not modified; 
-please see : https://github.com/ivpusic/react-native-image-crop-picker
+In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` with value that describes why you need access to user photos. More info here https://forums.developer.apple.com/thread/62229. Depending on what features you use, you also may need `NSCameraUsageDescription` and `NSMicrophoneUsageDescription` keys.
+
+#### Step 2:
+
+##### Cocoapods (Highly recommended)
+
+```
+cd ios
+pod init
+```
+
+After this you have to add pod dependencies to `Podfile`. Open `Podfile` with your editor, and add or adjust example configuration:
+
+```
+platform :ios, '8.0'
+
+target '<your_project_name>' do
+    pod 'RSKImageCropper'
+    pod 'QBImagePickerController'
+end
+```
+
+After this run:
+
+```
+pod install
+```
+
+##### Manual
+
+- Drag and drop the ios/ImageCropPickerSDK folder to your xcode project. (Make sure Copy items if needed IS ticked)
+- Click on project General tab
+  - Under `Deployment Info` set `Deployment Target` to `8.0`
+  - Under `Embedded Binaries` click `+` and add `RSKImageCropper.framework` and `QBImagePicker.framework`
+
+
 
 In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` with value that describes why do you need access to user photos. More info here https://forums.developer.apple.com/thread/62229. Depending on what features you use, you also may need `NSCameraUsageDescription` and `NSMicrophoneUsageDescription` keys.
 

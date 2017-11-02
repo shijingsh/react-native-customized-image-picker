@@ -54,12 +54,12 @@ RCT_EXPORT_MODULE();
                                 @"includeExif": @NO,
                                 @"compressVideo": @YES,
                                 @"minFiles": @1,
-                                @"maxFiles": @5,
+                                @"maxSize": @9,
                                 @"width": @200,
                                 @"waitAnimationEnd": @YES,
                                 @"height": @200,
                                 @"useFrontCamera": @NO,
-                                @"compressImageQuality": @1,
+                                @"compressQuality": @100,
                                 @"compressVideoPreset": @"MediumQuality",
                                 @"loadingLabelText": @"Processing assets...",
                                 @"mediaType": @"any",
@@ -249,7 +249,7 @@ RCT_EXPORT_METHOD(openPicker:(NSDictionary *)options
             imagePickerController.delegate = self;
             imagePickerController.allowsMultipleSelection = [[self.options objectForKey:@"multiple"] boolValue];
             imagePickerController.minimumNumberOfSelection = abs([[self.options objectForKey:@"minFiles"] intValue]);
-            imagePickerController.maximumNumberOfSelection = abs([[self.options objectForKey:@"maxFiles"] intValue]);
+            imagePickerController.maximumNumberOfSelection = abs([[self.options objectForKey:@"maxSize"] intValue]);
             imagePickerController.showsNumberOfSelectedAssets = [[self.options objectForKey:@"showsSelectedCount"] boolValue];
             
             if ([self.options objectForKey:@"smartAlbums"] != nil) {
@@ -285,6 +285,8 @@ RCT_EXPORT_METHOD(openPicker:(NSDictionary *)options
             }
             
             [[self getRootVC] presentViewController:imagePickerController animated:YES completion:nil];
+            
+            
         });
     }];
 }
@@ -407,8 +409,8 @@ RCT_EXPORT_METHOD(openCropper:(NSDictionary *)options
      }];
 }
 
-- (NSDictionary*) createAttachmentResponse:(NSString*)filePath withExif:(NSDictionary*) exif withSourceURL:(NSString*)sourceURL withLocalIdentifier:(NSString*)localIdentifier withFilename:(NSString*)filename withWidth:(NSNumber*)width withHeight:(NSNumber*)height withMime:(NSString*)mime withSize:(NSNumber*)size withData:(NSString*)data {
-    return @{
+- (NSArray*) createAttachmentResponse:(NSString*)filePath withExif:(NSDictionary*) exif withSourceURL:(NSString*)sourceURL withLocalIdentifier:(NSString*)localIdentifier withFilename:(NSString*)filename withWidth:(NSNumber*)width withHeight:(NSNumber*)height withMime:(NSString*)mime withSize:(NSNumber*)size withData:(NSString*)data {
+    return @[@{
              @"path": filePath,
              @"sourceURL": (sourceURL) ? sourceURL : [NSNull null],
              @"localIdentifier": (localIdentifier) ? localIdentifier : [NSNull null],
@@ -419,7 +421,7 @@ RCT_EXPORT_METHOD(openCropper:(NSDictionary *)options
              @"size": size,
              @"data": (data) ? data : [NSNull null],
              @"exif": (exif) ? exif : [NSNull null],
-             };
+             }];
 }
 
 - (void)qb_imagePickerController:

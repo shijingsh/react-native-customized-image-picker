@@ -31,8 +31,8 @@
 
 - (ImageResult*) compressImageDimensions:(UIImage*)image
                              withOptions:(NSDictionary*)options {
-    NSNumber *maxWidth = [options valueForKey:@"compressImageMaxWidth"];
-    NSNumber *maxHeight = [options valueForKey:@"compressImageMaxHeight"];
+    NSNumber *maxWidth = [options valueForKey:@"width"];
+    NSNumber *maxHeight = [options valueForKey:@"height"];
     ImageResult *result = [[ImageResult alloc] init];
                                 
     //[origin] if ([maxWidth integerValue] == 0 || [maxHeight integerValue] == 0) {
@@ -69,11 +69,11 @@
                    withOptions:(NSDictionary*)options {
     ImageResult *result = [self compressImageDimensions:image withOptions:options];
     
-    NSNumber *compressQuality = [options valueForKey:@"compressImageQuality"];
+    NSNumber *compressQuality = [options valueForKey:@"compressQuality"];
     if (compressQuality == nil) {
-        compressQuality = [NSNumber numberWithFloat:1];
+        compressQuality = [NSNumber numberWithFloat:100];
     }
-    
+    compressQuality = [NSNumber numberWithFloat:  [compressQuality floatValue] / 100];
     result.data = UIImageJPEGRepresentation(result.image, [compressQuality floatValue]);
     result.mime = @"image/jpeg";
     
