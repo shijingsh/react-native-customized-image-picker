@@ -39,6 +39,17 @@ ImagePicker.openPicker({
 });
 ```
 
+### Optional cleanup
+Module is creating tmp images which are going to be cleaned up automatically somewhere in the future. If you want to force cleanup, you can use `clean` to clean all tmp files.
+Delete the cut, compression, and photographed pictures.
+```javascript
+ImagePicker.clean().then(() => {
+  console.log('removed all tmp images from tmp directory');
+}).catch(e => {
+  console.log(e);
+});
+```
+
 #### Request Object
 
 | Property        | Type           | Description  |
@@ -157,14 +168,16 @@ It is basically wrapper around few libraries
 
 ## Update log
 
+#### 0.0.33
+- add optional cleanup
+
 #### 0.0.30
 - RxGalleryFinal  upgrade
 - add param
 - fixed bug
 
 #### 0.0.29
-- 增加returnAfterShot和title参数
-- 图片选择过滤临时目录
+- add param "returnAfterShot" and "title"
 
 ## License
 *MIT*

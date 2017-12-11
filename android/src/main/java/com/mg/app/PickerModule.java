@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import cn.finalteam.rxgalleryfinal.RxGalleryFinal;
+import cn.finalteam.rxgalleryfinal.RxGalleryFinalApi;
 import cn.finalteam.rxgalleryfinal.bean.ImageCropBean;
 import cn.finalteam.rxgalleryfinal.bean.MediaBean;
 import cn.finalteam.rxgalleryfinal.imageloader.ImageLoaderType;
@@ -313,6 +314,14 @@ class PickerModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void clean(final Promise promise) {
+        String path = RxGalleryFinalApi.getImgSaveRxDirByStr();
+        File file = new File(path);
+
+        deleteRecursive(file);
+        promise.resolve(null);
+    }
     private String getBase64StringFromFile(String absoluteFilePath) {
         InputStream inputStream;
 
@@ -366,5 +375,15 @@ class PickerModule extends ReactContextBaseJavaModule {
         }
 
         return bmp;
+    }
+
+    private void deleteRecursive(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory()) {
+            for (File child : fileOrDirectory.listFiles()) {
+                deleteRecursive(child);
+            }
+        }
+
+        fileOrDirectory.delete();
     }
 }
