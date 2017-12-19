@@ -21,7 +21,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.0.3'
     compile 'com.facebook.react:react-native:+'
 
-    compile 'com.mg.RxCustomizedImagePicker:library:0.0.9'
+    compile 'com.mg.RxCustomizedImagePicker:library:0.0.10'
     //rxgalleryfinal依赖appcompat-v7和recyclerview-v7扩展卡库
     compile 'com.android.support:recyclerview-v7:25.0.3'
 
