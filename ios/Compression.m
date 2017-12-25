@@ -68,11 +68,23 @@
 - (ImageResult*) compressImage:(UIImage*)image
                    withOptions:(NSDictionary*)options {
     ImageResult *result = [self compressImageDimensions:image withOptions:options];
-    
+
     NSNumber *compressQuality = [options valueForKey:@"compressQuality"];
+    NSNumber *minCompressSize = [options valueForKey:@"minCompressSize"];
+
     if (compressQuality == nil) {
         compressQuality = [NSNumber numberWithFloat:100];
     }
+    minCompressSize = [NSNumber numberWithFloat:100];
+    if (minCompressSize != nil) {
+        NSData * imageData = UIImageJPEGRepresentation(image,1);
+
+        long fileSize = [imageData length]/ 1024;
+        if(fileSize&lt; [minCompressSize longValue]){
+            compressQuality = [NSNumber numberWithFloat:100];
+        }
+    }
+
     compressQuality = [NSNumber numberWithFloat:  [compressQuality floatValue] / 100];
     result.data = UIImageJPEGRepresentation(result.image, [compressQuality floatValue]);
     result.mime = @"image/jpeg";

@@ -64,6 +64,7 @@ ImagePicker.clean().then(() => {
 | maxSize  | number (default 9) | set image count |
 | includeBase64 | bool (default false) | Enable or disable includeBase64 |
 | compressQuality  | number([0-100]) | Picture compression ratio |
+| minCompressSize  | number | Setting the minimum size of the compressed file |
 | title  | string | Sets the title of the page |
 | isVideo | bool (default false)      | Enable or disable video only | 
 | isHidePreview | bool (default false)      | Enable or disable hidden preview button | 
@@ -100,8 +101,9 @@ in AndroidManifest.xml add follow:
         <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
         <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 ```
+                
 ### iOS
-    thinks to : https://github.com/ivpusic/react-native-image-crop-picker
+  - thinks to : https://github.com/ivpusic/react-native-image-crop-picker
 #### Step 1:
 
 In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` with value that describes why you need access to user photos. More info here https://forums.developer.apple.com/thread/62229. Depending on what features you use, you also may need `NSCameraUsageDescription` and `NSMicrophoneUsageDescription` keys.
@@ -167,6 +169,9 @@ It is basically wrapper around few libraries
 - RSKImageCropper
 
 ## Update log
+
+#### 0.0.36
+- add optional minCompressSize
 
 #### 0.0.33
 - add optional cleanup
