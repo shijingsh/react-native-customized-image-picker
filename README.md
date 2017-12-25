@@ -64,7 +64,7 @@ ImagePicker.clean().then(() => {
 | maxSize  | number (default 9) | set image count |
 | includeBase64 | bool (default false) | Enable or disable includeBase64 |
 | compressQuality  | number([0-100]) | Picture compression ratio |
-| minCompressSize  | number | Setting the minimum size of the compressed file |
+| minCompressSize  | number | Setting the minimum size of the compressed file(kb) |
 | title  | string | Sets the title of the page |
 | isVideo | bool (default false)      | Enable or disable video only | 
 | isHidePreview | bool (default false)      | Enable or disable hidden preview button | 
