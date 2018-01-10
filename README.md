@@ -61,6 +61,7 @@ ImagePicker.clean().then(() => {
 | isCamera | bool (default false) | Enable or disable camera selection |
 | openCameraOnStart | bool (default false) | Enable or disable turn on the camera when it starts |
 | returnAfterShot | bool (default false) | Enable or disable pictures taken directly |
+| multipleShot | bool (default false) | Enable or disable Capture image multiple time |
 | maxSize  | number (default 9) | set image count |
 | includeBase64 | bool (default false) | Enable or disable includeBase64 |
 | compressQuality  | number([0-100]) | Picture compression ratio |
@@ -169,6 +170,9 @@ It is basically wrapper around few libraries
 - RSKImageCropper
 
 ## Update log
+
+#### 0.0.37
+- add optional multipleShot
 
 #### 0.0.36
 - add optional minCompressSize

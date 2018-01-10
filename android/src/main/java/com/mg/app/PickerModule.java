@@ -63,6 +63,7 @@ class PickerModule extends ReactContextBaseJavaModule {
     private int maxSize = 9;
     private int compressQuality = -1;
     private boolean returnAfterShot = false;
+    private boolean multipleShot  = false;
     private final ReactApplicationContext mReactContext;
 
     private Compression compression = new Compression();
@@ -89,6 +90,7 @@ class PickerModule extends ReactContextBaseJavaModule {
         compressQuality = options.hasKey("compressQuality") ? options.getInt("compressQuality") : compressQuality;
         title = options.hasKey("title") ? options.getString("title") : title;
         returnAfterShot = options.hasKey("returnAfterShot") && options.getBoolean("returnAfterShot");
+        multipleShot = options.hasKey("multipleShot") && options.getBoolean("multipleShot");
         isVideo = options.hasKey("isVideo") && options.getBoolean("isVideo");
         isHidePreview = options.hasKey("isHidePreview") && options.getBoolean("isHidePreview");
         isHideVideoPreview = options.hasKey("isHideVideoPreview") && options.getBoolean("isHideVideoPreview");
@@ -111,7 +113,7 @@ class PickerModule extends ReactContextBaseJavaModule {
     private WritableMap getAsyncSelection(final Activity activity,String path) throws Exception {
         String mime = getMimeType(path);
         if (mime != null && mime.startsWith("video/")) {
-          return  getVideo(activity, path, mime);
+            return  getVideo(activity, path, mime);
         }
 
         return getImage(activity,path);
@@ -215,6 +217,9 @@ class PickerModule extends ReactContextBaseJavaModule {
         }
         if(returnAfterShot){
             rxGalleryFinal.returnAfterShot();
+        }
+        if(multipleShot){
+            rxGalleryFinal.multipleShot();
         }
         if(isVideo){
             rxGalleryFinal.video();
