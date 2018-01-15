@@ -171,7 +171,7 @@ It is basically wrapper around few libraries
 
 ## Update log
 
-#### 0.0.37
+#### 0.0.38
 - add optional multipleShot
 
 #### 0.0.36
