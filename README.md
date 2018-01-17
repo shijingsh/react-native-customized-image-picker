@@ -12,6 +12,20 @@ iOS/Android image picker with support for camera, video compression, multiple im
 <a href="https://nodei.co/npm/react-native-customized-image-picker/">
   <img src="https://nodei.co/npm/react-native-customized-image-picker.svg?downloads=true&downloadRank=true&stars=true">
 </a>
+<p>
+  <a href="https://badge.fury.io/js/react-native-customized-image-picker">
+    <img src="https://badge.fury.io/js/react-native-customized-image-picker.svg" alt="npm version" height="18">
+  </a>
+  <a href="https://npmjs.org/react-native-customized-image-picker">
+    <img src="https://img.shields.io/npm/dm/react-native-customized-image-picker.svg" alt="npm downloads" height="18">
+  </a>
+  <a href="https://travis-ci.org/aws/react-native-customized-image-picker">
+    <img src="https://travis-ci.org/aws/react-native-customized-image-picker.svg?branch=master" alt="build:started">
+  </a>
+  <a href="https://codecov.io/gh/aws/react-native-customized-image-picker">
+    <img src="https://codecov.io/gh/aws/react-native-customized-image-picker/branch/master/graph/badge.svg" />
+  </a>
+</p>
 
 use version
 ```
