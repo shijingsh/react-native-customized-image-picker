@@ -9,6 +9,10 @@ iOS/Android image picker with support for camera, video compression, multiple im
 </p>
 
 ## Usage
+<a href="https://nodei.co/npm/react-native-customized-image-picker/">
+  <img src="https://nodei.co/npm/react-native-customized-image-picker.svg?downloads=true&downloadRank=true&stars=true">
+</a>
+
 use version
 ```
 version >= 0.0.20
