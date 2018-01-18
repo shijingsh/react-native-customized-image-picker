@@ -254,7 +254,7 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
     </style>
  </resources>
  ```   
- - modify file AndroidManifest.xml.
+ - modify file AndroidManifest.xml add activity of MediaActivity.
   ```xml
     <application
       android:name=".MainApplication"
@@ -267,7 +267,6 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
             android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"
             android:exported="true"
             android:theme="@style/AppTheme.Test" />
-      <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
     </application>
    ```   
 ## How it works?
