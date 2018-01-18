@@ -215,7 +215,7 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
        
     </style>
-    <style name="Theme_Light.AppTheme">
+    <style name="AppTheme.Test">
         <item name="gallery_toolbar_bg">#233</item>
         <item name="gallery_toolbar_close_image">@mipmap/ic_launcher</item>
         <item name="gallery_toolbar_close_color">#223</item>
@@ -254,6 +254,22 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
     </style>
  </resources>
  ```   
+ - modify file AndroidManifest.xml.
+  ```xml
+    <application
+      android:name=".MainApplication"
+      android:allowBackup="true"
+      android:label="@string/app_name"
+      android:icon="@mipmap/ic_launcher"
+      android:theme="@style/AppTheme">
+      
+        <activity
+            android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme.Test" />
+      <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+    </application>
+   ```   
 ## How it works?
 
 It is basically wrapper around few libraries
