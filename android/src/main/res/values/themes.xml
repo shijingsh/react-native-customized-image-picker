@@ -5,7 +5,9 @@
         <!--<item name="gallery_ucrop_title_text">@string/gallery_ucrop_menu_crop</item>-->
     </style>
 
-    <style name="Theme_Light.Default"/>
+    <style name="Theme_Light.Default">
+
+    </style>
 
     <style name="Theme_Light.White">
         <item name="gallery_toolbar_bg">@color/theme_white_primary</item>

@@ -176,6 +176,84 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
   - Under `Deployment Info` set `Deployment Target` to `8.0`
   - Under `Embedded Binaries` click `+` and add `RSKImageCropper.framework` and `QBImagePicker.framework`
 
+## Setting themes  
+
+#### Setting language
+  - Add file gallery_strings.xml under the directory "yourProject\android\app\src\main\res\values". 
+```xml
+<resources>
+    <string name="gallery_loading_view_click_loading_more">Load more</string>
+    <string name="gallery_loading_view_no_more">No more</string>
+    <string name="gallery_loading_view_loading">Loading…</string>
+
+    <string name="gallery_over_button_text">Complete</string>
+    <string name="gallery_over_button_text_checked">Complete(%1$d/%2$d)</string>
+    <string name="gallery_image_max_size_tip">You can only choose %1$d photos</string>
+    <string name="gallery_page_title">%1$d/%2$d</string>
+    <string name="gallery_media_grid_image_title">photos</string>
+    <string name="gallery_media_grid_video_title">video</string>
+    <string name="gallery_default_request_storage_access_permission_tips">App request to read your album</string>
+    <string name="gallery_default_camera_access_permission_tips">>App request to Camera</string>
+    <string name="gallery_default_media_empty_tips">Absolutely empty</string>
+    <string name="gallery_device_no_camera_tips">The device has no camera</string>
+    <string name="gallery_device_camera_unable">Camera not available</string>
+    <string name="gallery_preview_title">preview</string>
+    <string name="gallery_all_image">All pictures</string>
+    <string name="gallery_all_video">All video</string>
+    <string name="gallery_take_image">Photograph</string>
+    <string name="gallery_image_selected">Selected</string>
+    <string name="gallery_image_unit">pictures</string>
+    <string name="gallery_title_cut">cut</string>
+    <string name="gallery_video">record video</string>
+</resources>
+```
+#### Setting style
+
+- modify file styles.xml under the directory "yourProject\android\app\src\main\res\values".
+ ```xml
+ <resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+       
+    </style>
+    <style name="Theme_Light.AppTheme">
+        <item name="gallery_toolbar_bg">#233</item>
+        <item name="gallery_toolbar_close_image">@mipmap/ic_launcher</item>
+        <item name="gallery_toolbar_close_color">#223</item>
+        <item name="gallery_toolbar_widget_color">#2A2A2F</item>
+        <item name="gallery_toolbar_text_color">#fff</item>
+        <item name="gallery_toolbar_text_size">@dimen/font_size</item>
+        <item name="gallery_toolbar_divider_height">@dimen/activity_vertical_margin</item>
+        <item name="gallery_toolbar_divider_bg">@color/theme_blue_dark</item>
+        <item name="gallery_toolbar_bottom_margin">@dimen/column_width</item>
+        <item name="gallery_toolbar_text_gravity">right</item>
+        <item name="gallery_toolbar_height">@dimen/activity_horizontal_margin</item>
+        <item name="gallery_toolbar_over_button_bg">@mipmap/ic_launcher</item>
+        <item name="gallery_toolbar_over_button_text_size">@dimen/font_size</item>
+        <item name="gallery_toolbar_over_button_text_color">#446</item>
+        <item name="gallery_toolbar_over_button_pressed_color">@color/theme_blue_dark</item>
+        <item name="gallery_toolbar_over_button_normal_color">@color/theme_blue_dark</item>
+        <item name="gallery_color_statusbar">@color/theme_blue_dark</item>
+        <item name="gallery_color_active_widget">@color/theme_blue_dark</item>
+        <item name="gallery_checkbox_button_tint_color">@color/theme_blue_dark</item>
+        <item name="gallery_checkbox_text_color">@color/theme_blue_dark</item>
+        <item name="gallery_page_bg">#FFFFFF</item>
+        <item name="gallery_default_image">@mipmap/ic_launcher</item>
+        <item name="gallery_camera_image">@mipmap/ic_launcher</item>
+        <item name="gallery_camera_bg">@color/theme_blue_dark</item>
+        <item name="gallery_take_image_text_color">@color/theme_blue_dark</item>
+        <item name="gallery_ucrop_status_bar_color">@color/theme_blue_dark</item>
+        <item name="gallery_ucrop_toolbar_color">@color/theme_blue_dark</item>
+        <item name="gallery_ucrop_toolbar_widget_color">@color/theme_blue_dark</item>
+        <item name="gallery_ucrop_activity_widget_color">@color/theme_blue_dark</item>
+        <item name="gallery_ucrop_toolbar_title">@string/app_name</item>
+    </style>
+
+    <style name="gallery_checkBox" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:scaleX">1.5</item>
+        <item name="android:scaleY">1.5</item>
+    </style>
+ </resources>
+ ```   
 ## How it works?
 
 It is basically wrapper around few libraries
