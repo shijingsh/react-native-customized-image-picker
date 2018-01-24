@@ -252,7 +252,7 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
        
     </style>
-    <style name="AppTheme.Test">
+    <style name="Theme_Light.Default">
         <item name="gallery_toolbar_bg">#233</item>
         <item name="gallery_toolbar_close_image">@mipmap/ic_launcher</item>
         <item name="gallery_toolbar_close_color">#223</item>
@@ -291,21 +291,29 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
     </style>
  </resources>
  ```   
- - modify file AndroidManifest.xml add activity of MediaActivity.
-  ```xml
+ - modify file AndroidManifest.xml .
+
+  <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      <b> xmlns:tools="http://schemas.android.com/tools"</b> 
+      package="com.example"
+      android:versionCode="1"
+      android:versionName="1.0">
+      ...
     <application
       android:name=".MainApplication"
       android:allowBackup="true"
       android:label="@string/app_name"
       android:icon="@mipmap/ic_launcher"
+      tools:replace="android:theme"
       android:theme="@style/AppTheme">
-      
+        ...
         <activity
             android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"
             android:exported="true"
-            android:theme="@style/AppTheme.Test" />
+            android:theme="@style/Theme_Light.Default" />
     </application>
-   ```   
+  </manifest>
+    
 ## How it works?
 
 It is basically wrapper around few libraries
