@@ -132,31 +132,31 @@ react-native link react-native-customized-image-picker
 
 ##### android
 
-in AndroidManifest.xml add follow:
+  - in AndroidManifest.xml add follow:
 
-```html
-        <uses-permission android:name="android.permission.CAMERA" />
-        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-```
+    ```html
+            <uses-permission android:name="android.permission.CAMERA" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    ```
  
  - If you use the previous version of rn49,and got exception  as follows:
- ```                                         
-  java.lang.AbstractMethodError: abstract method "void com.facebook.imagepipeline.producers.ProducerListener.onUltimateProducerReached(java.lang.String, java.lang.String, boolean)"
- ```
+     ```                                         
+      java.lang.AbstractMethodError: abstract method "void com.facebook.imagepipeline.producers.ProducerListener.onUltimateProducerReached(java.lang.String, java.lang.String, boolean)"
+     ```
  
  - to change dependent class library :
      ```
           compile 'com.facebook.fresco:fresco:1.3.0'
           compile 'com.facebook.fresco:animated-gif:1.3.0'
     ```
-   - chang to                                    
+ - chang to                                    
     ```
          compile 'com.facebook.fresco:fresco:1.0.1'
          compile 'com.facebook.fresco:animated-gif:1.0.1'
     
     ```
-   - setting compileSdkVersion and buildToolsVersion
+ - setting compileSdkVersion and buildToolsVersion
    ```
               android {
                   compileSdkVersion 25
