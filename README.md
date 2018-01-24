@@ -57,6 +57,26 @@ ImagePicker.openPicker({
 });
 ```
 
+### Select from camera
+```javascript
+ImagePicker.openCamera({
+  width: 300,
+  height: 400,
+  cropping: true
+}).then(image => {
+  console.log(image);
+});
+```
+ Select video
+```javascript
+ImagePicker.openCamera({
+  width: 300,
+  height: 400,
+  isVideo: true
+}).then(image => {
+  console.log(image);
+});
+```
 ### Optional cleanup
 Module is creating tmp images which are going to be cleaned up automatically somewhere in the future. If you want to force cleanup, you can use `clean` to clean all tmp files.
 Delete the cut, compression, and photographed pictures.

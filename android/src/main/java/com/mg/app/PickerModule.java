@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.util.Base64;
 import android.webkit.MimeTypeMap;
-import android.widget.Toast;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -326,6 +325,99 @@ class PickerModule extends ReactContextBaseJavaModule {
 
         deleteRecursive(file);
         promise.resolve(null);
+    }
+
+    @ReactMethod
+    public void openCamera(final ReadableMap options, final Promise promise) {
+        {
+            final Activity activity = getCurrentActivity();
+
+            if (activity == null) {
+                promise.reject(E_ACTIVITY_DOES_NOT_EXIST, "Activity doesn't exist");
+                return;
+            }
+
+            setConfiguration(options);
+            initImageLoader(activity);
+            mPickerPromise = promise;
+
+            RxGalleryFinal rxGalleryFinal =  RxGalleryFinal.with(activity);
+            if(compressQuality>0){
+                rxGalleryFinal.cropropCompressionQuality(compressQuality);
+            }
+            rxGalleryFinal.openCameraOnStart();
+            rxGalleryFinal.returnAfterShot();
+            if(isVideo){
+                rxGalleryFinal.video();
+            }else {
+                rxGalleryFinal.image();
+            }
+
+            if(isPlayGif){
+                rxGalleryFinal.gif();
+            }
+            if (imageLoader != null){
+                switch (imageLoader){
+                    case "PICASSO":
+                        rxGalleryFinal.imageLoader(ImageLoaderType.PICASSO);
+                        break;
+                    case "GLIDE":
+                        rxGalleryFinal.imageLoader(ImageLoaderType.GLIDE);
+                        break;
+                    case "FRESCO":
+                        rxGalleryFinal.imageLoader(ImageLoaderType.FRESCO);
+                        break;
+                    case "UNIVERSAL":
+                        rxGalleryFinal.imageLoader(ImageLoaderType.UNIVERSAL);
+                        break;
+                    default:
+                        break;
+                }
+            }else{
+                rxGalleryFinal.imageLoader(ImageLoaderType.GLIDE);
+            }
+            if(!this.multiple) {
+                if(cropping){
+                    rxGalleryFinal.crop();
+                    rxGalleryFinal.cropMaxResultSize(this.width,this.height);
+                    //裁剪图片的回调
+                    RxGalleryListener
+                            .getInstance()
+                            .setRadioImageCheckedListener(
+                                    new IRadioImageCheckedListener() {
+                                        @Override
+                                        public void cropAfter(Object t) {
+                                            WritableArray resultArr = new WritableNativeArray();
+                                            try {
+                                                resultArr.pushMap(getAsyncSelection(activity,t.toString()));
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                            mPickerPromise.resolve(resultArr);
+                                        }
+
+                                        @Override
+                                        public boolean isActivityFinish() {
+                                            return true;
+                                        }
+                                    });
+                }
+                rxGalleryFinal
+                        .radio()
+                        .subscribe(new RxBusResultDisposable<ImageRadioResultEvent>() {
+                            @Override
+                            protected void onEvent(ImageRadioResultEvent imageRadioResultEvent) throws Exception {
+                                if(!cropping){
+                                    ImageCropBean result = imageRadioResultEvent.getResult();
+                                    WritableArray resultArr = new WritableNativeArray();
+                                    resultArr.pushMap(getAsyncSelection(activity,result));
+                                    mPickerPromise.resolve(resultArr);
+                                }
+                            }
+                        })
+                        .openGallery();
+            }
+        }
     }
     private String getBase64StringFromFile(String absoluteFilePath) {
         InputStream inputStream;
