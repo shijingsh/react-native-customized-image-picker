@@ -292,9 +292,10 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
  </resources>
  ```   
  - modify file AndroidManifest.xml .
-
+ 
+  ```xml
   <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      <b> xmlns:tools="http://schemas.android.com/tools"</b> 
+      xmlns:tools="http://schemas.android.com/tools"
       package="com.example"
       android:versionCode="1"
       android:versionName="1.0">
@@ -313,7 +314,15 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
             android:theme="@style/Theme_Light.Default" />
     </application>
   </manifest>
-    
+  ```    
+  
+ - xmlns:tools="http://schemas.android.com/tools"
+ - tools:replace="android:theme"
+ - android:theme="@style/AppTheme"
+ - <activity
+             android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"
+             android:exported="true"
+             android:theme="@style/Theme_Light.Default" />
 ## How it works?
 
 It is basically wrapper around few libraries
