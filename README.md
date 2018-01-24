@@ -315,14 +315,11 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
     </application>
   </manifest>
   ```    
-  
+  ##### Important content
  - xmlns:tools="http://schemas.android.com/tools"
  - tools:replace="android:theme"
  - android:theme="@style/AppTheme"
- - <activity
-             android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"
-             android:exported="true"
-             android:theme="@style/Theme_Light.Default" />
+ - cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity  Theme_Light.Default
 ## How it works?
 
 It is basically wrapper around few libraries
