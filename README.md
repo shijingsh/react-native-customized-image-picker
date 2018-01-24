@@ -136,7 +136,6 @@ in AndroidManifest.xml add follow:
 
 ```html
         <uses-permission android:name="android.permission.CAMERA" />
-        <uses-feature android:name="android.hardware.camera" android:required="true"/>
         <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
         <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 ```
@@ -147,17 +146,23 @@ in AndroidManifest.xml add follow:
  ```
  
  - to change dependent class library :
- ```
-      compile 'com.facebook.fresco:fresco:1.3.0'
-      compile 'com.facebook.fresco:animated-gif:1.3.0'
-```
+     ```
+          compile 'com.facebook.fresco:fresco:1.3.0'
+          compile 'com.facebook.fresco:animated-gif:1.3.0'
+    ```
    - chang to                                    
-```
-     compile 'com.facebook.fresco:fresco:1.0.1'
-     compile 'com.facebook.fresco:animated-gif:1.0.1'
-
-```
-              
+    ```
+         compile 'com.facebook.fresco:fresco:1.0.1'
+         compile 'com.facebook.fresco:animated-gif:1.0.1'
+    
+    ```
+   - setting compileSdkVersion and buildToolsVersion
+   ```
+              android {
+                  compileSdkVersion 25
+                  buildToolsVersion "25.0.3"
+             }
+   ```
 ### iOS
   - thinks to : https://github.com/ivpusic/react-native-image-crop-picker
 #### Step 1:
