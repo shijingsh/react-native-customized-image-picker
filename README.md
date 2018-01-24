@@ -298,7 +298,7 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
       package="com.example"
       android:versionCode="1"
       android:versionName="1.0">
-      ...
+      
     <application
       android:name=".MainApplication"
       android:allowBackup="true"
@@ -306,7 +306,7 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
       android:icon="@mipmap/ic_launcher"
       tools:replace="android:theme"
       android:theme="@style/AppTheme">
-        ...
+        
         <activity
             android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"
             android:exported="true"
