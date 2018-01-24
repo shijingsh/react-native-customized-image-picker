@@ -145,12 +145,12 @@ react-native link react-native-customized-image-picker
       java.lang.AbstractMethodError: abstract method "void com.facebook.imagepipeline.producers.ProducerListener.onUltimateProducerReached(java.lang.String, java.lang.String, boolean)"
      ```
  
- - to change dependent class library :
+     to change dependent class library :
      ```
           compile 'com.facebook.fresco:fresco:1.3.0'
           compile 'com.facebook.fresco:animated-gif:1.3.0'
     ```
- - chang to                                    
+    chang to                                    
     ```
          compile 'com.facebook.fresco:fresco:1.0.1'
          compile 'com.facebook.fresco:animated-gif:1.0.1'
