@@ -57,8 +57,8 @@ class PickerModule extends ReactContextBaseJavaModule {
     private String title = null;
     private String imageLoader = null;
     //Light Blue 500
-    private int width = 200;
-    private int height = 200;
+    private int width = 0;
+    private int height = 0;
     private int maxSize = 9;
     private int compressQuality = -1;
     private boolean returnAfterShot = false;
