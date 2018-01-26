@@ -80,7 +80,7 @@
         NSData * imageData = UIImageJPEGRepresentation(image,1);
 
         long fileSize = [imageData length]/ 1024;
-        if(fileSize&lt; [minCompressSize longValue]){
+        if(fileSize < [minCompressSize longValue]){
             compressQuality = [NSNumber numberWithFloat:100];
         }
     }
