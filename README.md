@@ -101,7 +101,7 @@ ImagePicker.clean().then(() => {
 | returnAfterShot | bool (default false) | Enable or disable pictures taken directly |
 | multipleShot | bool (default false) | Enable or disable Capture image multiple time |
 | maxSize  | number (default 9) | set image count |
-| in  | number (default 3) | Set the number of pictures displayed  a row |
+| spanCount  | number (default 3) | Set the number of pictures displayed in a row |
 | includeBase64 | bool (default false) | Enable or disable includeBase64 |
 | compressQuality  | number([0-100]) | Picture compression ratio |
 | minCompressSize  | number | Setting the minimum size of the compressed file(kb) |
