@@ -63,6 +63,7 @@ class PickerModule extends ReactContextBaseJavaModule {
     private int compressQuality = -1;
     private boolean returnAfterShot = false;
     private boolean multipleShot  = false;
+    private int spanCount = 3;
     private final ReactApplicationContext mReactContext;
 
     private Compression compression = new Compression();
@@ -94,6 +95,7 @@ class PickerModule extends ReactContextBaseJavaModule {
         isHidePreview = options.hasKey("isHidePreview") && options.getBoolean("isHidePreview");
         isHideVideoPreview = options.hasKey("isHideVideoPreview") && options.getBoolean("isHideVideoPreview");
         isPlayGif = options.hasKey("isPlayGif") && options.getBoolean("isPlayGif");
+        spanCount = options.hasKey("spanCount") ? options.getInt("spanCount") : spanCount;
 
         imageLoader = options.hasKey("imageLoader") ? options.getString("imageLoader") : imageLoader;
         this.options = options;
@@ -203,6 +205,7 @@ class PickerModule extends ReactContextBaseJavaModule {
         mPickerPromise = promise;
 
         RxGalleryFinal rxGalleryFinal =  RxGalleryFinal.with(activity);
+        rxGalleryFinal.spanCount(spanCount);
         if(openCameraOnStart){
             rxGalleryFinal.openCameraOnStart();
         }else if(!isCamera){
