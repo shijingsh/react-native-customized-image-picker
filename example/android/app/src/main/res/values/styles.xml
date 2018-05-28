@@ -4,5 +4,41 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
     </style>
+    <style name="Theme_Light.Default">
+<!--        <item name="gallery_toolbar_bg">#233</item>
+        <item name="gallery_toolbar_close_image">@mipmap/ic_launcher</item>
+        <item name="gallery_toolbar_close_color">#223</item>
+        <item name="gallery_toolbar_widget_color">#2A2A2F</item>
+        <item name="gallery_toolbar_text_color">#fff</item>
+        <item name="gallery_toolbar_text_size">16dp</item>
+        <item name="gallery_toolbar_divider_height">16dp</item>
+        <item name="gallery_toolbar_divider_bg">#1976D2</item>
+        <item name="gallery_toolbar_bottom_margin">10dp</item>
+        <item name="gallery_toolbar_text_gravity">right</item>
+        <item name="gallery_toolbar_height">16dp</item>
+        <item name="gallery_toolbar_over_button_bg">@mipmap/ic_launcher</item>
+        <item name="gallery_toolbar_over_button_text_size">16dp</item>
+        <item name="gallery_toolbar_over_button_text_color">#446</item>
+        <item name="gallery_toolbar_over_button_pressed_color">#1976D2</item>
+        <item name="gallery_toolbar_over_button_normal_color">#1976D2</item>
+        <item name="gallery_color_statusbar">#1976D2</item>
+        <item name="gallery_color_active_widget">#1976D2</item>-->
+        <item name="gallery_checkbox_button_tint_color">#1976D2</item>
+        <item name="gallery_checkbox_text_color">#1976D2</item>
+<!--        <item name="gallery_page_bg">#FFFFFF</item>
+        <item name="gallery_default_image">@mipmap/ic_launcher</item>
+        <item name="gallery_camera_image">@mipmap/ic_launcher</item>
+        <item name="gallery_camera_bg">#1976D2</item>
+        <item name="gallery_take_image_text_color">#1976D2</item>
+        <item name="gallery_ucrop_status_bar_color">#1976D2</item>
+        <item name="gallery_ucrop_toolbar_color">#1976D2</item>
+        <item name="gallery_ucrop_toolbar_widget_color">#1976D2</item>
+        <item name="gallery_ucrop_activity_widget_color">#1976D2</item>
+        <item name="gallery_ucrop_toolbar_title">@string/app_name</item>-->
+    </style>
 
+    <style name="gallery_checkBox" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:scaleX">1.5</item>
+        <item name="android:scaleY">1.5</item>
+    </style>
 </resources>
