@@ -54,6 +54,7 @@ class PickerModule extends ReactContextBaseJavaModule {
     private boolean isHidePreview = false;
     private boolean isPlayGif = false;
     private boolean isHideVideoPreview = false;
+    private boolean isSelectBoth = false;
     private String title = null;
     private String imageLoader = null;
     //Light Blue 500
@@ -92,6 +93,7 @@ class PickerModule extends ReactContextBaseJavaModule {
         returnAfterShot = options.hasKey("returnAfterShot") && options.getBoolean("returnAfterShot");
         multipleShot = options.hasKey("multipleShot") && options.getBoolean("multipleShot");
         isVideo = options.hasKey("isVideo") && options.getBoolean("isVideo");
+        isSelectBoth = options.hasKey("isSelectBoth") && options.getBoolean("isSelectBoth");
         isHidePreview = options.hasKey("isHidePreview") && options.getBoolean("isHidePreview");
         isHideVideoPreview = options.hasKey("isHideVideoPreview") && options.getBoolean("isHideVideoPreview");
         isPlayGif = options.hasKey("isPlayGif") && options.getBoolean("isPlayGif");
@@ -228,6 +230,9 @@ class PickerModule extends ReactContextBaseJavaModule {
         }else {
             rxGalleryFinal.image();
         }
+        if(isSelectBoth){
+            rxGalleryFinal.selectBoth();
+        }
         if(isHidePreview){
             rxGalleryFinal.hidePreview();
         }
@@ -355,7 +360,9 @@ class PickerModule extends ReactContextBaseJavaModule {
             }else {
                 rxGalleryFinal.image();
             }
-
+            if(isSelectBoth){
+                rxGalleryFinal.selectBoth();
+            }
             if(isPlayGif){
                 rxGalleryFinal.gif();
             }

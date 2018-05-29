@@ -107,6 +107,7 @@ ImagePicker.clean().then(() => {
 | minCompressSize  | number | Setting the minimum size of the compressed file(kb) |
 | title  | string | Sets the title of the page |
 | isVideo | bool (default false)      | Enable or disable video only | 
+| isSelectBoth | bool (default false)      | Enable or disable select both images and videos | 
 | isHidePreview | bool (default false)      | Enable or disable hidden preview button | 
 | isHideVideoPreview | bool (default false)      | Enable or disable hidden video preview button | 
 | isPlayGif | bool (default false)      | Enable or disable play gif | 
