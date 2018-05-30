@@ -55,6 +55,7 @@ export default class App extends Component {
             width: 300,
             height: 300,
             cropping: cropit,
+            isSelectBoth: true,
             isCamera:true
         }).then(images => {
             this.setState({
