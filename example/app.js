@@ -90,6 +90,27 @@ export default class App extends Component {
     });
     }
 
+    pickMultipleVideo(cropit) {
+        ImagePicker.openPicker({
+            width: 300,
+            height: 300,
+            isVideo:true,
+            isCamera:true,
+            multiple: true,
+            cropping: cropit
+        }).then(images => {
+            this.setState({
+                images: images.map(i => {
+                    console.log('received image', i);
+                    return {uri: i.path, width: i.width, height: i.height, mime: i.mime};
+                })
+            });
+        }).catch(e => {
+            console.log(e.code);
+            alert(e);
+        });
+    }
+
     pickSingleAndCamera() {
         ImagePicker.openPicker({
             isCamera:true,
@@ -171,6 +192,9 @@ export default class App extends Component {
         <TouchableOpacity onPress={() => this.pickSingleVideo(false)} style={styles.button}>
     <Text style={styles.text}>Select Single video</Text>
         </TouchableOpacity>
+            <TouchableOpacity onPress={() => this.pickMultipleVideo(false)} style={styles.button}>
+                <Text style={styles.text}>Select multiple video</Text>
+            </TouchableOpacity>
         <TouchableOpacity onPress={() => this.pickSingleBase64(false)} style={styles.button}>
     <Text style={styles.text}>Select Single Returning Base64</Text>
         </TouchableOpacity>

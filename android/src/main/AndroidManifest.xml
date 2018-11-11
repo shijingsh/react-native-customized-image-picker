@@ -1,11 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mg.app">
-    
-    <uses-feature android:name="android.hardware.camera" android:required="true"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    
+          package="com.mg.app">
+
     <application>
+
         <activity android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"
                   android:screenOrientation="portrait"
                   android:exported="true"

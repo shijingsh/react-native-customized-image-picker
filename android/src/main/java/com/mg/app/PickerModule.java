@@ -265,7 +265,12 @@ class PickerModule extends ReactContextBaseJavaModule {
         if(!this.multiple) {
             if(cropping){
                 rxGalleryFinal.crop();
-                rxGalleryFinal.cropMaxResultSize(this.width,this.height);
+                if(this.width>0 && this.height>0){
+                    rxGalleryFinal.cropMaxResultSize(this.width,this.height);
+                }
+                rxGalleryFinal.cropWithAspectRatio(1,1);
+                rxGalleryFinal.cropHideBottomControls(true);
+                rxGalleryFinal.cropFreeStyleCropEnabled(true);
                 //裁剪图片的回调
                 RxGalleryListener
                         .getInstance()
@@ -389,7 +394,12 @@ class PickerModule extends ReactContextBaseJavaModule {
             if(!this.multiple) {
                 if(cropping){
                     rxGalleryFinal.crop();
-                    rxGalleryFinal.cropMaxResultSize(this.width,this.height);
+                    if(this.width>0 && this.height>0){
+                        rxGalleryFinal.cropMaxResultSize(this.width,this.height);
+                    }
+                    rxGalleryFinal.cropWithAspectRatio(1,1);
+                    rxGalleryFinal.cropHideBottomControls(true);
+                    rxGalleryFinal.cropFreeStyleCropEnabled(true);
                     //裁剪图片的回调
                     RxGalleryListener
                             .getInstance()
