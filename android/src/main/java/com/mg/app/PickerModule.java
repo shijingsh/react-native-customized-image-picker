@@ -65,6 +65,7 @@ class PickerModule extends ReactContextBaseJavaModule {
     private boolean returnAfterShot = false;
     private boolean multipleShot  = false;
     private int spanCount = 3;
+    private boolean hideCropBottomControls = true;
     private final ReactApplicationContext mReactContext;
 
     private Compression compression = new Compression();
@@ -98,6 +99,7 @@ class PickerModule extends ReactContextBaseJavaModule {
         isHideVideoPreview = options.hasKey("isHideVideoPreview") && options.getBoolean("isHideVideoPreview");
         isPlayGif = options.hasKey("isPlayGif") && options.getBoolean("isPlayGif");
         spanCount = options.hasKey("spanCount") ? options.getInt("spanCount") : spanCount;
+        hideCropBottomControls = options.hasKey("hideCropBottomControls") ? options.getBoolean("hideCropBottomControls") : hideCropBottomControls;
 
         imageLoader = options.hasKey("imageLoader") ? options.getString("imageLoader") : imageLoader;
         this.options = options;
@@ -269,8 +271,9 @@ class PickerModule extends ReactContextBaseJavaModule {
                     rxGalleryFinal.cropMaxResultSize(this.width,this.height);
                 }
                 rxGalleryFinal.cropWithAspectRatio(1,1);
-                rxGalleryFinal.cropHideBottomControls(true);
+                rxGalleryFinal.cropHideBottomControls(this.hideCropBottomControls);
                 rxGalleryFinal.cropFreeStyleCropEnabled(true);
+                //rxGalleryFinal.cropOvalDimmedLayer(true);
                 //裁剪图片的回调
                 RxGalleryListener
                         .getInstance()
@@ -398,7 +401,7 @@ class PickerModule extends ReactContextBaseJavaModule {
                         rxGalleryFinal.cropMaxResultSize(this.width,this.height);
                     }
                     rxGalleryFinal.cropWithAspectRatio(1,1);
-                    rxGalleryFinal.cropHideBottomControls(true);
+                    rxGalleryFinal.cropHideBottomControls(this.hideCropBottomControls);
                     rxGalleryFinal.cropFreeStyleCropEnabled(true);
                     //裁剪图片的回调
                     RxGalleryListener

@@ -110,7 +110,8 @@ ImagePicker.clean().then(() => {
 | isSelectBoth | bool (default false)      | Enable or disable select both images and videos | 
 | isHidePreview | bool (default false)      | Enable or disable hidden preview button | 
 | isHideVideoPreview | bool (default false)      | Enable or disable hidden video preview button | 
-| isPlayGif | bool (default false)      | Enable or disable play gif | 
+| isPlayGif | bool (default false)      | Enable or disable play gif |
+| hideCropBottomControls | bool (default true)   | Enable or disable crop controls | 
 | imageLoader | string (default "GLIDE")      | Sets the imageLoader of the page,enum(PICASSO,GLIDE,FRESCO,UNIVERSAL) | 
 #### Response Object
 
@@ -134,14 +135,6 @@ react-native link react-native-customized-image-picker
 
 ##### android
 
-  - in AndroidManifest.xml add follow:
-
-    ```html
-            <uses-permission android:name="android.permission.CAMERA" />
-            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    ```
- 
  - If you use the previous version of rn49,and got exception  as follows:
      ```                                         
       java.lang.AbstractMethodError: abstract method "void com.facebook.imagepipeline.producers.ProducerListener.onUltimateProducerReached(java.lang.String, java.lang.String, boolean)"
@@ -161,8 +154,8 @@ react-native link react-native-customized-image-picker
  - setting compileSdkVersion and buildToolsVersion
    ```
               android {
-                  compileSdkVersion 25
-                  buildToolsVersion "25.0.3"
+                  compileSdkVersion 28
+                  buildToolsVersion "28.0.3"
              }
    ```
 ### iOS
