@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.List;
 
 import cn.finalteam.rxgalleryfinal.RxGalleryFinal;
@@ -66,6 +67,9 @@ class PickerModule extends ReactContextBaseJavaModule {
     private boolean multipleShot  = false;
     private int spanCount = 3;
     private boolean hideCropBottomControls = true;
+    //宽高比
+    private float aspectRatioX = 1;
+    private float aspectRatioY = 1;
     private final ReactApplicationContext mReactContext;
 
     private Compression compression = new Compression();
@@ -100,6 +104,9 @@ class PickerModule extends ReactContextBaseJavaModule {
         isPlayGif = options.hasKey("isPlayGif") && options.getBoolean("isPlayGif");
         spanCount = options.hasKey("spanCount") ? options.getInt("spanCount") : spanCount;
         hideCropBottomControls = options.hasKey("hideCropBottomControls") ? options.getBoolean("hideCropBottomControls") : hideCropBottomControls;
+
+        aspectRatioX = options.hasKey("aspectRatioX") ? options.getInt("aspectRatioX") : aspectRatioX;
+        aspectRatioY = options.hasKey("aspectRatioY") ? options.getInt("aspectRatioY") : aspectRatioY;
 
         imageLoader = options.hasKey("imageLoader") ? options.getString("imageLoader") : imageLoader;
         this.options = options;
@@ -195,6 +202,35 @@ class PickerModule extends ReactContextBaseJavaModule {
         ImageLoader.getInstance().init(config.build());
     }
 
+    private void initCrop(RxGalleryFinal rxGalleryFinal){
+        //设置剪切最大宽度，高度
+        if(this.width>0 && this.height>0){
+            rxGalleryFinal.cropMaxResultSize(this.width,this.height);
+        }
+        //用户设置的宽高比优先
+        if(aspectRatioX>1||aspectRatioY>1){
+            rxGalleryFinal.cropWithAspectRatio(aspectRatioX,aspectRatioY);
+            rxGalleryFinal.cropFreeStyleCropEnabled(true);
+        }else {
+            if(this.width>0 && this.height>0){
+                //x=宽，y=高
+                if(this.width>this.height){
+                    float f = new BigDecimal(this.width).divide(new BigDecimal(this.height),1,BigDecimal.ROUND_HALF_UP).floatValue();
+                    rxGalleryFinal.cropWithAspectRatio(f*10,10);
+                }else {
+                    float f = new BigDecimal(this.height).divide(new BigDecimal(this.width),1,BigDecimal.ROUND_HALF_UP).floatValue();
+                    rxGalleryFinal.cropWithAspectRatio(10,f*10);
+                }
+
+                rxGalleryFinal.cropFreeStyleCropEnabled(false);
+            }else{
+                rxGalleryFinal.cropWithAspectRatio(aspectRatioX,aspectRatioY);
+                rxGalleryFinal.cropFreeStyleCropEnabled(true);
+            }
+        }
+        rxGalleryFinal.cropHideBottomControls(this.hideCropBottomControls);
+    }
+
     @ReactMethod
     public void openPicker(final ReadableMap options, final Promise promise) {
         final Activity activity = getCurrentActivity();
@@ -267,13 +303,7 @@ class PickerModule extends ReactContextBaseJavaModule {
         if(!this.multiple) {
             if(cropping){
                 rxGalleryFinal.crop();
-                if(this.width>0 && this.height>0){
-                    rxGalleryFinal.cropMaxResultSize(this.width,this.height);
-                }
-                rxGalleryFinal.cropWithAspectRatio(1,1);
-                rxGalleryFinal.cropHideBottomControls(this.hideCropBottomControls);
-                rxGalleryFinal.cropFreeStyleCropEnabled(true);
-                //rxGalleryFinal.cropOvalDimmedLayer(true);
+                initCrop(rxGalleryFinal);
                 //裁剪图片的回调
                 RxGalleryListener
                         .getInstance()
@@ -397,12 +427,7 @@ class PickerModule extends ReactContextBaseJavaModule {
             if(!this.multiple) {
                 if(cropping){
                     rxGalleryFinal.crop();
-                    if(this.width>0 && this.height>0){
-                        rxGalleryFinal.cropMaxResultSize(this.width,this.height);
-                    }
-                    rxGalleryFinal.cropWithAspectRatio(1,1);
-                    rxGalleryFinal.cropHideBottomControls(this.hideCropBottomControls);
-                    rxGalleryFinal.cropFreeStyleCropEnabled(true);
+                    initCrop(rxGalleryFinal);
                     //裁剪图片的回调
                     RxGalleryListener
                             .getInstance()

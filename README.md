@@ -112,6 +112,8 @@ ImagePicker.clean().then(() => {
 | isHideVideoPreview | bool (default false)      | Enable or disable hidden video preview button | 
 | isPlayGif | bool (default false)      | Enable or disable play gif |
 | hideCropBottomControls | bool (default true)   | Enable or disable crop controls | 
+| aspectRatioX  | number (default 1) | Set an aspect ratio X for crop bounds. |
+| aspectRatioY  | number (default 1) | Set an aspect ratio Y for crop bounds. |
 | imageLoader | string (default "GLIDE")      | Sets the imageLoader of the page,enum(PICASSO,GLIDE,FRESCO,UNIVERSAL) | 
 #### Response Object
 

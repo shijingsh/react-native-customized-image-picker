@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Random;
 
 import cn.finalteam.rxgalleryfinal.RxGalleryFinalApi;
 import id.zelory.compressor.Compressor;
@@ -40,7 +42,7 @@ class Compression {
         String path = RxGalleryFinalApi.getImgSaveRxDirByStr();
         Compressor compressor = new Compressor(activity)
                 .setCompressFormat(Bitmap.CompressFormat.JPEG)
-                .setDestinationDirectoryPath(path);
+                .setDestinationDirectoryPath(path+File.separator+"compressed");
 
         compressor.setQuality(quality);
 
@@ -55,13 +57,26 @@ class Compression {
         File image = new File(originalImagePath);
 
         String[] paths = image.getName().split("\\.(?=[^\\.]+$)");
-        String compressedFileName = paths[0] + "-compressed";
+        String compressedFileName ="IMG_" +generateRandomFilename() + "_compressed";
 
         if(paths.length > 1)
             compressedFileName += "." + paths[1];
 
         return compressor
                 .compressToFile(image, compressedFileName);
+    }
+
+    public String generateRandomFilename(){
+
+        Random random = new Random();
+        int ends = random.nextInt(99);
+        String randomStr = String.format("%02d",ends);
+
+        Calendar calCurrent = Calendar.getInstance();
+
+        String now = String.valueOf(calCurrent.getTimeInMillis());
+
+        return now + randomStr;
     }
 
     synchronized void compressVideo(final Activity activity, final ReadableMap options,
