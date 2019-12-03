@@ -114,6 +114,7 @@ ImagePicker.clean().then(() => {
 | hideCropBottomControls | bool (default true)   | Enable or disable crop controls | 
 | aspectRatioX  | number (default 1) | Set an aspect ratio X for crop bounds. |
 | aspectRatioY  | number (default 1) | Set an aspect ratio Y for crop bounds. |
+| videoQuality  | number (default 1) | 1: high 0: low. |
 | imageLoader | string (default "GLIDE")      | Sets the imageLoader of the page,enum(PICASSO,GLIDE,FRESCO,UNIVERSAL) | 
 #### Response Object
 

@@ -56,6 +56,7 @@ class PickerModule extends ReactContextBaseJavaModule {
     private boolean isPlayGif = false;
     private boolean isHideVideoPreview = false;
     private boolean isSelectBoth = false;
+    private boolean videoQuality = 1;
     private String title = null;
     private String imageLoader = null;
     //Light Blue 500
@@ -99,6 +100,7 @@ class PickerModule extends ReactContextBaseJavaModule {
         multipleShot = options.hasKey("multipleShot") && options.getBoolean("multipleShot");
         isVideo = options.hasKey("isVideo") && options.getBoolean("isVideo");
         isSelectBoth = options.hasKey("isSelectBoth") && options.getBoolean("isSelectBoth");
+        videoQuality = options.hasKey("videoQuality") && options.getInt("videoQuality");
         isHidePreview = options.hasKey("isHidePreview") && options.getBoolean("isHidePreview");
         isHideVideoPreview = options.hasKey("isHideVideoPreview") && options.getBoolean("isHideVideoPreview");
         isPlayGif = options.hasKey("isPlayGif") && options.getBoolean("isPlayGif");
@@ -246,6 +248,7 @@ class PickerModule extends ReactContextBaseJavaModule {
 
         RxGalleryFinal rxGalleryFinal =  RxGalleryFinal.with(activity);
         rxGalleryFinal.spanCount(spanCount);
+        rxGalleryFinal.setVideoQuality(videoQuality);
         if(openCameraOnStart){
             rxGalleryFinal.openCameraOnStart();
         }else if(!isCamera){
@@ -388,6 +391,7 @@ class PickerModule extends ReactContextBaseJavaModule {
             mPickerPromise = promise;
 
             RxGalleryFinal rxGalleryFinal =  RxGalleryFinal.with(activity);
+            rxGalleryFinal.setVideoQuality(videoQuality);
             if(compressQuality>0){
                 rxGalleryFinal.cropropCompressionQuality(compressQuality);
             }
