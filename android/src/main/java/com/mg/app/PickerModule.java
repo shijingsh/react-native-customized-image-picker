@@ -56,7 +56,7 @@ class PickerModule extends ReactContextBaseJavaModule {
     private boolean isPlayGif = false;
     private boolean isHideVideoPreview = false;
     private boolean isSelectBoth = false;
-    private boolean videoQuality = 1;
+    private int videoQuality = 1;
     private String title = null;
     private String imageLoader = null;
     //Light Blue 500
@@ -100,7 +100,7 @@ class PickerModule extends ReactContextBaseJavaModule {
         multipleShot = options.hasKey("multipleShot") && options.getBoolean("multipleShot");
         isVideo = options.hasKey("isVideo") && options.getBoolean("isVideo");
         isSelectBoth = options.hasKey("isSelectBoth") && options.getBoolean("isSelectBoth");
-        videoQuality = options.hasKey("videoQuality") && options.getInt("videoQuality");
+        videoQuality = options.hasKey("videoQuality") ? options.getInt("videoQuality"):1;
         isHidePreview = options.hasKey("isHidePreview") && options.getBoolean("isHidePreview");
         isHideVideoPreview = options.hasKey("isHideVideoPreview") && options.getBoolean("isHideVideoPreview");
         isPlayGif = options.hasKey("isPlayGif") && options.getBoolean("isPlayGif");
