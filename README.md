@@ -133,7 +133,12 @@ ImagePicker.clean().then(() => {
 npm i react-native-customized-image-picker --save
 react-native link react-native-customized-image-picker
 ```
-
+#### add permission <pickerExample>/android/app/src/main/AndroidManifest.xml
+...
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+...
 #### Post-install steps
 
 ##### android
