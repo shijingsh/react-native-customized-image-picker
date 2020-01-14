@@ -15,4 +15,4 @@ FOUNDATION_EXPORT double QBImagePickerVersionNumber;
 FOUNDATION_EXPORT const unsigned char QBImagePickerVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <QBImagePicker/PublicHeader.h>
-#import <QBImagePicker/QBImagePickerController.h>
+#import <QBImagePickerController.h>

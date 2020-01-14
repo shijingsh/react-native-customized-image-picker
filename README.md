@@ -1,4 +1,5 @@
 # react-native-customized-image-picker
+
 iOS/Android image picker with support for camera, video compression, multiple images and cropping
 
 ## Result
@@ -9,6 +10,7 @@ iOS/Android image picker with support for camera, video compression, multiple im
 </p>
 
 ## Usage
+
 <a href="https://nodei.co/npm/react-native-customized-image-picker/">
   <img src="https://nodei.co/npm/react-native-customized-image-picker.svg?downloads=true&downloadRank=true&stars=true">
 </a>
@@ -28,27 +30,29 @@ iOS/Android image picker with support for camera, video compression, multiple im
 </p>
 
 use version
+
 ```
 version >= 0.0.20
 ```
 
 Import library
+
 ```javascript
-import ImagePicker from 'react-native-customized-image-picker';
+import ImagePicker from "react-native-customized-image-picker";
 ```
 
 #### Select from gallery
 
-Call single image picker 
+Call single image picker
+
 ```javascript
-ImagePicker.openPicker({
-  
-}).then(image => {
+ImagePicker.openPicker({}).then(image => {
   console.log(image);
 });
 ```
 
 Call multiple image picker
+
 ```javascript
 ImagePicker.openPicker({
   multiple: true
@@ -58,6 +62,7 @@ ImagePicker.openPicker({
 ```
 
 ### Select from camera
+
 ```javascript
 ImagePicker.openCamera({
   width: 300,
@@ -67,7 +72,9 @@ ImagePicker.openCamera({
   console.log(image);
 });
 ```
- Select video
+
+Select video
+
 ```javascript
 ImagePicker.openCamera({
   width: 300,
@@ -77,55 +84,61 @@ ImagePicker.openCamera({
   console.log(image);
 });
 ```
+
 ### Optional cleanup
+
 Module is creating tmp images which are going to be cleaned up automatically somewhere in the future. If you want to force cleanup, you can use `clean` to clean all tmp files.
 Delete the cut, compression, and photographed pictures.
+
 ```javascript
-ImagePicker.clean().then(() => {
-  console.log('removed all tmp images from tmp directory');
-}).catch(e => {
-  console.log(e);
-});
+ImagePicker.clean()
+  .then(() => {
+    console.log("removed all tmp images from tmp directory");
+  })
+  .catch(e => {
+    console.log(e);
+  });
 ```
 
 #### Request Object
 
-| Property        | Type           | Description  |
-| ------------- |:-------------:| :-----|
-| cropping | bool (default false)      | Enable or disable cropping |
-| width       | number(default 200) | Width of result image when used with `cropping` option |
-| height      | number(default 200) | Height of result image when used with `cropping` option |
-| multiple | bool (default false) | Enable or disable multiple image selection |
-| isCamera | bool (default false) | Enable or disable camera selection |
-| openCameraOnStart | bool (default false) | Enable or disable turn on the camera when it starts |
-| returnAfterShot | bool (default false) | Enable or disable pictures taken directly |
-| multipleShot | bool (default false) | Enable or disable Capture image multiple time |
-| maxSize  | number (default 9) | set image count |
-| spanCount  | number (default 3) | Set the number of pictures displayed in a row |
-| includeBase64 | bool (default false) | Enable or disable includeBase64 |
-| compressQuality  | number([0-100]) | Picture compression ratio |
-| minCompressSize  | number | Setting the minimum size of the compressed file(kb) |
-| title  | string | Sets the title of the page |
-| isVideo | bool (default false)      | Enable or disable video only | 
-| isSelectBoth | bool (default false)      | Enable or disable select both images and videos | 
-| isHidePreview | bool (default false)      | Enable or disable hidden preview button | 
-| isHideVideoPreview | bool (default false)      | Enable or disable hidden video preview button | 
-| isPlayGif | bool (default false)      | Enable or disable play gif |
-| hideCropBottomControls | bool (default true)   | Enable or disable crop controls | 
-| aspectRatioX  | number (default 1) | Set an aspect ratio X for crop bounds. |
-| aspectRatioY  | number (default 1) | Set an aspect ratio Y for crop bounds. |
-| videoQuality  | number (default 1) | 1: high 0: low. |
-| imageLoader | string (default "GLIDE")      | Sets the imageLoader of the page,enum(PICASSO,GLIDE,FRESCO,UNIVERSAL) | 
+| Property               |           Type           | Description                                                           |
+| ---------------------- | :----------------------: | :-------------------------------------------------------------------- |
+| cropping               |   bool (default false)   | Enable or disable cropping                                            |
+| width                  |   number(default 200)    | Width of result image when used with `cropping` option                |
+| height                 |   number(default 200)    | Height of result image when used with `cropping` option               |
+| multiple               |   bool (default false)   | Enable or disable multiple image selection                            |
+| isCamera               |   bool (default false)   | Enable or disable camera selection                                    |
+| openCameraOnStart      |   bool (default false)   | Enable or disable turn on the camera when it starts                   |
+| returnAfterShot        |   bool (default false)   | Enable or disable pictures taken directly                             |
+| multipleShot           |   bool (default false)   | Enable or disable Capture image multiple time                         |
+| maxSize                |    number (default 9)    | set image count                                                       |
+| spanCount              |    number (default 3)    | Set the number of pictures displayed in a row                         |
+| includeBase64          |   bool (default false)   | Enable or disable includeBase64                                       |
+| compressQuality        |     number([0-100])      | Picture compression ratio                                             |
+| minCompressSize        |          number          | Setting the minimum size of the compressed file(kb)                   |
+| title                  |          string          | Sets the title of the page                                            |
+| isVideo                |   bool (default false)   | Enable or disable video only                                          |
+| isSelectBoth           |   bool (default false)   | Enable or disable select both images and videos                       |
+| isHidePreview          |   bool (default false)   | Enable or disable hidden preview button                               |
+| isHideVideoPreview     |   bool (default false)   | Enable or disable hidden video preview button                         |
+| isPlayGif              |   bool (default false)   | Enable or disable play gif                                            |
+| hideCropBottomControls |   bool (default true)    | Enable or disable crop controls                                       |
+| aspectRatioX           |    number (default 1)    | Set an aspect ratio X for crop bounds.                                |
+| aspectRatioY           |    number (default 1)    | Set an aspect ratio Y for crop bounds.                                |
+| videoQuality           |    number (default 1)    | 1: high 0: low.                                                       |
+| imageLoader            | string (default "GLIDE") | Sets the imageLoader of the page,enum(PICASSO,GLIDE,FRESCO,UNIVERSAL) |
+
 #### Response Object
 
-| Property        | Type           | Description  |
-| ------------- |:-------------:| :-----|
-| path          | string | Selected image location |
-| width      | number      | Selected image width |
-| height | number      | Selected image height |
-| mime | string | Selected image MIME type (image/jpeg, image/png) |
-| size | number | Selected image size in bytes |
-| data | base64 | Optional base64 selected file representation |
+| Property |  Type  | Description                                      |
+| -------- | :----: | :----------------------------------------------- |
+| path     | string | Selected image location                          |
+| width    | number | Selected image width                             |
+| height   | number | Selected image height                            |
+| mime     | string | Selected image MIME type (image/jpeg, image/png) |
+| size     | number | Selected image size in bytes                     |
+| data     | base64 | Optional base64 selected file representation     |
 
 ## Install
 
@@ -133,6 +146,7 @@ ImagePicker.clean().then(() => {
 npm i react-native-customized-image-picker --save
 react-native link react-native-customized-image-picker
 ```
+
 #### add permission <pickerExample>/android/app/src/main/AndroidManifest.xml
 
 ```xml
@@ -145,60 +159,64 @@ react-native link react-native-customized-image-picker
 
 ##### android
 
- - If you use the previous version of rn49,and got exception  as follows:
-     ```                                         
-      java.lang.AbstractMethodError: abstract method "void com.facebook.imagepipeline.producers.ProducerListener.onUltimateProducerReached(java.lang.String, java.lang.String, boolean)"
-     ```
- 
-     to change dependent class library :
-     ```
-          compile 'com.facebook.fresco:fresco:1.3.0'
-          compile 'com.facebook.fresco:animated-gif:1.3.0'
-    ```
-    chang to                                    
-    ```
-         compile 'com.facebook.fresco:fresco:1.0.1'
-         compile 'com.facebook.fresco:animated-gif:1.0.1'
-    
-    ```
- - setting compileSdkVersion and buildToolsVersion
-   ```
-              android {
-                  compileSdkVersion 28
-                  buildToolsVersion "28.0.3"
-             }
-   ```
+- If you use the previous version of rn49,and got exception as follows:
+
+  ```
+   java.lang.AbstractMethodError: abstract method "void com.facebook.imagepipeline.producers.ProducerListener.onUltimateProducerReached(java.lang.String, java.lang.String, boolean)"
+  ```
+
+  to change dependent class library :
+
+  ```
+       compile 'com.facebook.fresco:fresco:1.3.0'
+       compile 'com.facebook.fresco:animated-gif:1.3.0'
+  ```
+
+  chang to
+
+  ```
+       compile 'com.facebook.fresco:fresco:1.0.1'
+       compile 'com.facebook.fresco:animated-gif:1.0.1'
+
+  ```
+
+- setting compileSdkVersion and buildToolsVersion
+  ```
+             android {
+                 compileSdkVersion 28
+                 buildToolsVersion "28.0.3"
+            }
+  ```
+
 ### iOS
-  - thinks to : https://github.com/ivpusic/react-native-image-crop-picker
+
+- thinks to : https://github.com/ivpusic/react-native-image-crop-picker
+
 #### Step 1:
 
 In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` with value that describes why you need access to user photos. More info here https://forums.developer.apple.com/thread/62229. Depending on what features you use, you also may need `NSCameraUsageDescription` and `NSMicrophoneUsageDescription` keys.
 
 #### Step 2:
 
-##### Cocoapods (Highly recommended)
 
-```
+#### react-native >= 0.60 with cocoapods
+
+- Run the following:
+
+```bash
 cd ios
-pod init
-```
-
-After this you have to add pod dependencies to `Podfile`. Open `Podfile` with your editor, and add or adjust example configuration:
-
-```
-platform :ios, '8.0'
-
-target '<your_project_name>' do
-    pod 'RSKImageCropper'
-    pod 'QBImagePickerController'
-end
-```
-
-After this run:
-
-```
 pod install
 ```
+
+After this use `ios/<project_name>.xcworkspace`. **Do not use** `ios/<project_name>.xcodeproj`.
+
+##### Using local QBImagePicker
+
+It is recommended to use locally provided QBImagePicker pod, because it contains few improvements over original version.
+
+```
+pod 'QBImagePickerController', :path => '../node_modules/react-native-customized-image-picker/ios/QBImagePicker/QBImagePickerController.podspec'
+pod 'RSKImageCropper'
 
 ##### Manual
 
@@ -206,8 +224,6 @@ pod install
 - Click on project General tab
   - Under `Deployment Info` set `Deployment Target` to `8.0`
   - Under `Embedded Binaries` click `+` and add `RSKImageCropper.framework` and `QBImagePicker.framework`
-
-
 
 In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` with value that describes why do you need access to user photos. More info here https://forums.developer.apple.com/thread/62229. Depending on what features you use, you also may need `NSCameraUsageDescription` and `NSMicrophoneUsageDescription` keys.
 
@@ -223,10 +239,12 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
   - Under `Deployment Info` set `Deployment Target` to `8.0`
   - Under `Embedded Binaries` click `+` and add `RSKImageCropper.framework` and `QBImagePicker.framework`
 
-## Setting themes  
+## Setting themes
 
 #### Setting language
-  - Add file gallery_strings.xml under the directory "yourProject\android\app\src\main\res\values". 
+
+- Add file gallery_strings.xml under the directory "yourProject\android\app\src\main\res\values".
+
 ```xml
 <resources>
     <string name="gallery_loading_view_click_loading_more">Load more</string>
@@ -254,111 +272,126 @@ In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` wit
     <string name="gallery_video">record video</string>
 </resources>
 ```
+
 #### Setting style
 
 - modify file styles.xml under the directory "yourProject\android\app\src\main\res\values".
- ```xml
- <resources>
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-       
-    </style>
-    <style name="Theme_Light.Default">
-        <item name="gallery_toolbar_bg">#233</item>
-        <item name="gallery_toolbar_close_image">@mipmap/ic_launcher</item>
-        <item name="gallery_toolbar_close_color">#223</item>
-        <item name="gallery_toolbar_widget_color">#2A2A2F</item>
-        <item name="gallery_toolbar_text_color">#fff</item>
-        <item name="gallery_toolbar_text_size">16dp</item>
-        <item name="gallery_toolbar_divider_height">16dp</item>
-        <item name="gallery_toolbar_divider_bg">#1976D2</item>
-        <item name="gallery_toolbar_bottom_margin">10dp</item>
-        <item name="gallery_toolbar_text_gravity">right</item>
-        <item name="gallery_toolbar_height">16dp</item>
-        <item name="gallery_toolbar_over_button_bg">@mipmap/ic_launcher</item>
-        <item name="gallery_toolbar_over_button_text_size">16dp</item>
-        <item name="gallery_toolbar_over_button_text_color">#446</item>
-        <item name="gallery_toolbar_over_button_pressed_color">#1976D2</item>
-        <item name="gallery_toolbar_over_button_normal_color">#1976D2</item>
-        <item name="gallery_color_statusbar">#1976D2</item>
-        <item name="gallery_color_active_widget">#1976D2</item>
-        <item name="gallery_checkbox_button_tint_color">#1976D2</item>
-        <item name="gallery_checkbox_text_color">#1976D2</item>
-        <item name="gallery_page_bg">#FFFFFF</item>
-        <item name="gallery_default_image">@mipmap/ic_launcher</item>
-        <item name="gallery_camera_image">@mipmap/ic_launcher</item>
-        <item name="gallery_camera_bg">#1976D2</item>
-        <item name="gallery_take_image_text_color">#1976D2</item>
-        <item name="gallery_ucrop_status_bar_color">#1976D2</item>
-        <item name="gallery_ucrop_toolbar_color">#1976D2</item>
-        <item name="gallery_ucrop_toolbar_widget_color">#1976D2</item>
-        <item name="gallery_ucrop_activity_widget_color">#1976D2</item>
-        <item name="gallery_ucrop_toolbar_title">@string/app_name</item>
-    </style>
 
-    <style name="gallery_checkBox" parent="@android:style/Widget.CompoundButton.CheckBox">
-        <item name="android:scaleX">1.5</item>
-        <item name="android:scaleY">1.5</item>
-    </style>
- </resources>
- ```   
- - modify file AndroidManifest.xml .
- 
-  ```xml
-  <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:tools="http://schemas.android.com/tools"
-      package="com.example"
-      android:versionCode="1"
-      android:versionName="1.0">
-      
-    <application
-      android:name=".MainApplication"
-      android:allowBackup="true"
-      android:label="@string/app_name"
-      android:icon="@mipmap/ic_launcher"
-      tools:replace="android:theme"
-      android:theme="@style/AppTheme">
-        
-        <activity
-            android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"
-            android:exported="true"
-            android:theme="@style/Theme_Light.Default" />
-    </application>
-  </manifest>
-  ```    
-  ##### Important content
- - xmlns:tools="http://schemas.android.com/tools"
- - tools:replace="android:theme"
- - android:theme="@style/AppTheme"
- - cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity  Theme_Light.Default
+```xml
+<resources>
+   <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+
+   </style>
+   <style name="Theme_Light.Default">
+       <item name="gallery_toolbar_bg">#233</item>
+       <item name="gallery_toolbar_close_image">@mipmap/ic_launcher</item>
+       <item name="gallery_toolbar_close_color">#223</item>
+       <item name="gallery_toolbar_widget_color">#2A2A2F</item>
+       <item name="gallery_toolbar_text_color">#fff</item>
+       <item name="gallery_toolbar_text_size">16dp</item>
+       <item name="gallery_toolbar_divider_height">16dp</item>
+       <item name="gallery_toolbar_divider_bg">#1976D2</item>
+       <item name="gallery_toolbar_bottom_margin">10dp</item>
+       <item name="gallery_toolbar_text_gravity">right</item>
+       <item name="gallery_toolbar_height">16dp</item>
+       <item name="gallery_toolbar_over_button_bg">@mipmap/ic_launcher</item>
+       <item name="gallery_toolbar_over_button_text_size">16dp</item>
+       <item name="gallery_toolbar_over_button_text_color">#446</item>
+       <item name="gallery_toolbar_over_button_pressed_color">#1976D2</item>
+       <item name="gallery_toolbar_over_button_normal_color">#1976D2</item>
+       <item name="gallery_color_statusbar">#1976D2</item>
+       <item name="gallery_color_active_widget">#1976D2</item>
+       <item name="gallery_checkbox_button_tint_color">#1976D2</item>
+       <item name="gallery_checkbox_text_color">#1976D2</item>
+       <item name="gallery_page_bg">#FFFFFF</item>
+       <item name="gallery_default_image">@mipmap/ic_launcher</item>
+       <item name="gallery_camera_image">@mipmap/ic_launcher</item>
+       <item name="gallery_camera_bg">#1976D2</item>
+       <item name="gallery_take_image_text_color">#1976D2</item>
+       <item name="gallery_ucrop_status_bar_color">#1976D2</item>
+       <item name="gallery_ucrop_toolbar_color">#1976D2</item>
+       <item name="gallery_ucrop_toolbar_widget_color">#1976D2</item>
+       <item name="gallery_ucrop_activity_widget_color">#1976D2</item>
+       <item name="gallery_ucrop_toolbar_title">@string/app_name</item>
+   </style>
+
+   <style name="gallery_checkBox" parent="@android:style/Widget.CompoundButton.CheckBox">
+       <item name="android:scaleX">1.5</item>
+       <item name="android:scaleY">1.5</item>
+   </style>
+</resources>
+```
+
+- modify file AndroidManifest.xml .
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example"
+    android:versionCode="1"
+    android:versionName="1.0">
+
+  <application
+    android:name=".MainApplication"
+    android:allowBackup="true"
+    android:label="@string/app_name"
+    android:icon="@mipmap/ic_launcher"
+    tools:replace="android:theme"
+    android:theme="@style/AppTheme">
+
+      <activity
+          android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"
+          android:exported="true"
+          android:theme="@style/Theme_Light.Default" />
+  </application>
+</manifest>
+```
+
+##### Important content
+
+- xmlns:tools="http://schemas.android.com/tools"
+- tools:replace="android:theme"
+- android:theme="@style/AppTheme"
+- cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity Theme_Light.Default
+
 ## How it works?
 
 It is basically wrapper around few libraries
 
 #### Android
+
 - RxGalleryFinal: https://github.com/liukefu2050/RxGalleryFinal  
-                  forked from  https://github.com/FinalTeam/RxGalleryFinal
+   forked from https://github.com/FinalTeam/RxGalleryFinal
+
 #### iOS
+
 - QBImagePickerController
 - RSKImageCropper
 
 ## Update log
 
 #### 0.0.39
+
 - add optional multipleShot
 
 #### 0.0.36
+
 - add optional minCompressSize
 
 #### 0.0.33
+
 - add optional cleanup
 
 #### 0.0.30
-- RxGalleryFinal  upgrade
+
+- RxGalleryFinal upgrade
 - add param
 - fixed bug
 
 #### 0.0.29
+
 - add param "returnAfterShot" and "title"
 
 ## License
-*MIT*
+
+_MIT_
