@@ -5,8 +5,9 @@ iOS/Android image picker with support for camera, video compression, multiple im
 ## Result
 
 <p align="left">
-<img width=200 title="Multiple Pick" src="https://github.com/liukefu2050/react-native-customized-image-picker/blob/master/images/pic.png">
-<img width=200 title="video Pick" src="https://github.com/liukefu2050/react-native-customized-image-picker/blob/master/images/pic2.png">
+<img width=200 height=356 title="Multiple Pick" src="https://github.com/samad324/react-native-customized-image-picker/blob/master/images/pic.png">
+<img width=200 height=356 title="video Pick" src="https://github.com/samad324/react-native-customized-image-picker/blob/master/images/pic2.png">
+<img width=200 height=356 title="iOS multiple Pick" src="https://github.com/samad324/react-native-customized-image-picker/blob/master/images/pic3.png">
 </p>
 
 ## Usage
