@@ -217,6 +217,7 @@ It is recommended to use locally provided QBImagePicker pod, because it contains
 ```
 pod 'QBImagePickerController', :path => '../node_modules/react-native-customized-image-picker/ios/QBImagePicker/QBImagePickerController.podspec'
 pod 'RSKImageCropper'
+```
 
 ##### Manual
 
