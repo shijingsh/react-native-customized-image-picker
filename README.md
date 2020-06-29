@@ -30,13 +30,8 @@ iOS/Android image picker with support for camera, video compression, multiple im
   </a>
 </p>
 
-use version
 
-```
-version >= 0.0.20
-```
-
-Import library
+#### Import library
 
 ```javascript
 import ImagePicker from "react-native-customized-image-picker";
@@ -160,86 +155,18 @@ react-native link react-native-customized-image-picker
 
 ##### android
 
-- If you use the previous version of rn49,and got exception as follows:
-
-  ```
-   java.lang.AbstractMethodError: abstract method "void com.facebook.imagepipeline.producers.ProducerListener.onUltimateProducerReached(java.lang.String, java.lang.String, boolean)"
-  ```
-
-  to change dependent class library :
-
-  ```
-       compile 'com.facebook.fresco:fresco:1.3.0'
-       compile 'com.facebook.fresco:animated-gif:1.3.0'
-  ```
-
-  chang to
-
-  ```
-       compile 'com.facebook.fresco:fresco:1.0.1'
-       compile 'com.facebook.fresco:animated-gif:1.0.1'
-
-  ```
-
-- setting compileSdkVersion and buildToolsVersion
-  ```
-             android {
-                 compileSdkVersion 28
-                 buildToolsVersion "28.0.3"
-            }
-  ```
+auto linked
 
 ### iOS
 
 - thinks to : https://github.com/ivpusic/react-native-image-crop-picker
 
-#### Step 1:
-
-In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` with value that describes why you need access to user photos. More info here https://forums.developer.apple.com/thread/62229. Depending on what features you use, you also may need `NSCameraUsageDescription` and `NSMicrophoneUsageDescription` keys.
-
-#### Step 2:
-
-
-#### react-native >= 0.60 with cocoapods
-
-- Run the following:
+auto linked
 
 ```bash
 cd ios
 pod install
 ```
-
-After this use `ios/<project_name>.xcworkspace`. **Do not use** `ios/<project_name>.xcodeproj`.
-
-##### Using local QBImagePicker
-
-It is recommended to use locally provided QBImagePicker pod, because it contains few improvements over original version.
-
-```
-pod 'QBImagePickerController', :path => '../node_modules/react-native-customized-image-picker/ios/QBImagePicker/QBImagePickerController.podspec'
-pod 'RSKImageCropper'
-```
-
-##### Manual
-
-- Drag and drop the ios/ImageCropPickerSDK folder to your xcode project. (Make sure Copy items if needed IS ticked)
-- Click on project General tab
-  - Under `Deployment Info` set `Deployment Target` to `8.0`
-  - Under `Embedded Binaries` click `+` and add `RSKImageCropper.framework` and `QBImagePicker.framework`
-
-In Xcode open Info.plist and add string key `NSPhotoLibraryUsageDescription` with value that describes why do you need access to user photos. More info here https://forums.developer.apple.com/thread/62229. Depending on what features you use, you also may need `NSCameraUsageDescription` and `NSMicrophoneUsageDescription` keys.
-
-###### cocoapods users
-
-- Add `platform :ios, '8.0'` to Podfile (!important)
-- Add `pod 'RSKImageCropper'` and `pod 'QBImagePickerController'` to Podfile
-
-###### non-cocoapods users
-
-- Drag and drop the ios/ImageCropPickerSDK folder to your xcode project. (Make sure Copy items if needed IS ticked)
-- Click on project General tab
-  - Under `Deployment Info` set `Deployment Target` to `8.0`
-  - Under `Embedded Binaries` click `+` and add `RSKImageCropper.framework` and `QBImagePicker.framework`
 
 ## Setting themes
 
@@ -369,30 +296,6 @@ It is basically wrapper around few libraries
 
 - QBImagePickerController
 - RSKImageCropper
-
-## Update log
-
-#### 0.0.39
-
-- add optional multipleShot
-
-#### 0.0.36
-
-- add optional minCompressSize
-
-#### 0.0.33
-
-- add optional cleanup
-
-#### 0.0.30
-
-- RxGalleryFinal upgrade
-- add param
-- fixed bug
-
-#### 0.0.29
-
-- add param "returnAfterShot" and "title"
 
 ## License
 
