@@ -140,7 +140,7 @@ ImagePicker.clean()
 
 ```
 npm i react-native-customized-image-picker --save
-react-native link react-native-customized-image-picker
+yarn add react-native-customized-image-picker
 ```
 
 #### add permission <pickerExample>/android/app/src/main/AndroidManifest.xml
