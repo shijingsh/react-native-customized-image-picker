@@ -31,7 +31,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import cn.finalteam.rxgalleryfinal.RxGalleryFinal;
-import cn.finalteam.rxgalleryfinal.RxGalleryFinalApi;
+import cn.finalteam.rxgalleryfinal.ui.fragment.MediaGridFragment;
 import cn.finalteam.rxgalleryfinal.bean.ImageCropBean;
 import cn.finalteam.rxgalleryfinal.bean.MediaBean;
 import cn.finalteam.rxgalleryfinal.imageloader.ImageLoaderType;
@@ -369,7 +369,7 @@ class PickerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void clean(final Promise promise) {
-        String path = RxGalleryFinalApi.getImgSaveRxDirByStr();
+        String path = MediaGridFragment.getImageStoreDirByStr();
         File file = new File(path);
 
         deleteRecursive(file);

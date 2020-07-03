@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Random;
 
-import cn.finalteam.rxgalleryfinal.RxGalleryFinalApi;
+import cn.finalteam.rxgalleryfinal.ui.fragment.MediaGridFragment;
 import id.zelory.compressor.Compressor;
 
 
@@ -39,7 +39,7 @@ class Compression {
         if(minCompressSize != null && minCompressSize >0 && getFileSize(new File(originalImagePath)) < minCompressSize * 1024){
             return new File(originalImagePath);
         }
-        String path = RxGalleryFinalApi.getImgSaveRxDirByStr();
+        String path = MediaGridFragment.getImageStoreDirByStr();
         Compressor compressor = new Compressor(activity)
                 .setCompressFormat(Bitmap.CompressFormat.JPEG)
                 .setDestinationDirectoryPath(path+File.separator+"compressed");

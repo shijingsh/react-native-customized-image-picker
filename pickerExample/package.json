@@ -12,7 +12,7 @@
   "dependencies": {
     "react": "16.11.0",
     "react-native": "0.62.2",
-    "react-native-customized-image-picker": "^0.1.11",
+    "react-native-customized-image-picker": "^0.1.12",
     "react-native-video": "^5.0.2"
   },
   "devDependencies": {
