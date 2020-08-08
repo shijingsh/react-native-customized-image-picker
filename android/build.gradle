@@ -25,7 +25,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.facebook.react:react-native:+'
 
-    implementation 'com.mg.RxCustomizedImagePicker:library:0.1.5'
+    implementation 'com.mg.RxCustomizedImagePicker:library:0.1.6'
     //rxgalleryfinal依赖appcompat-v7和recyclerview-v7扩展卡库
     implementation 'com.android.support:recyclerview-v7:28.0.0'
 
