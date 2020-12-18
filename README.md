@@ -159,7 +159,7 @@ auto linked
 
 ### iOS
 
-- thinks to : https://github.com/ivpusic/react-native-image-crop-picker
+- [TZImagePickerController](https://github.com/banchichen/TZImagePickerController) 
 
 auto linked
 
