@@ -102,9 +102,9 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
     NSInteger videoMaximumDuration = [options sy_integerForKey:@"videoMaximumDuration"];
     NSInteger   compressQuality  = [self.cameraOptions sy_integerForKey:@"compressQuality"];
     if(multiple){
-        maxSize = maxSize?maxSize:9
+        maxSize = maxSize?maxSize:9;
     }else{
-        maxSize = maxSize?maxSize:1
+        maxSize = maxSize?maxSize:1;
     }
 
     TZImagePickerController *imagePickerVc = [[TZImagePickerController alloc] initWithMaxImagesCount:maxSize delegate:self];
@@ -195,15 +195,15 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
     BOOL allowPickingMultipleVideo = [self.cameraOptions sy_boolForKey:@"allowPickingMultipleVideo"];
     BOOL sortAscendingByModificationDate = [self.cameraOptions sy_boolForKey:@"sortAscendingByModificationDate"];
     BOOL showSelectedIndex = [self.cameraOptions sy_boolForKey:@"showSelectedIndex"];
-    BOOL multiple          = [options sy_boolForKey:@"multiple"];
+    BOOL multiple = [self.cameraOptions sy_boolForKey:@"multiple"];
     NSInteger CropW      = [self.cameraOptions sy_integerForKey:@"CropW"];
     NSInteger CropH      = [self.cameraOptions sy_integerForKey:@"CropH"];
     NSInteger circleCropRadius = [self.cameraOptions sy_integerForKey:@"circleCropRadius"];
     NSInteger   compressQuality  = [self.cameraOptions sy_integerForKey:@"compressQuality"];
     if(multiple){
-        maxSize = maxSize?maxSize:9
+        maxSize = maxSize?maxSize:9;
     }else{
-        maxSize = maxSize?maxSize:1
+        maxSize = maxSize?maxSize:1;
     }
     TZImagePickerController *imagePickerVc = [[TZImagePickerController alloc] initWithMaxImagesCount:maxSize delegate:self];
 
