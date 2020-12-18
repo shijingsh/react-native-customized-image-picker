@@ -82,7 +82,7 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
 - (void)openTZImagePicker:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback {
     NSInteger maxSize = [options sy_integerForKey:@"maxSize"];
     BOOL isCamera        = [options sy_boolForKey:@"isCamera"];
-    BOOL isCrop          = [options sy_boolForKey:@"isCrop"];
+    BOOL cropping          = [options sy_boolForKey:@"cropping"];
     BOOL isGif = [options sy_boolForKey:@"isGif"];
     BOOL allowPickingVideo = [options sy_boolForKey:@"allowPickingVideo"];
     BOOL allowPickingMultipleVideo = [options sy_boolForKey:@"allowPickingMultipleVideo"];
@@ -112,7 +112,7 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
     imagePickerVc.allowPickingOriginalPhoto = allowPickingOriginalPhoto; // 允许原图
     imagePickerVc.sortAscendingByModificationDate = sortAscendingByModificationDate;
     imagePickerVc.alwaysEnableDoneBtn = YES;
-    imagePickerVc.allowCrop = isCrop;   // 裁剪
+    imagePickerVc.allowCrop = cropping;   // 裁剪
     imagePickerVc.autoDismiss = NO;
     imagePickerVc.showSelectedIndex = showSelectedIndex;
     imagePickerVc.modalPresentationStyle = UIModalPresentationFullScreen;
@@ -125,7 +125,7 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
         // 单选模式
         imagePickerVc.showSelectBtn = NO;
 
-        if(isCrop){
+        if(cropping){
             if(showCropCircle) {
                 imagePickerVc.needCircleCrop = showCropCircle; //圆形裁剪
                 imagePickerVc.circleCropRadius = circleCropRadius; //圆形半径
@@ -179,7 +179,7 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
     NSInteger maxSize = [self.cameraOptions sy_integerForKey:@"maxSize"];
     // 显示内部拍照按钮
     BOOL isCamera        = [self.cameraOptions sy_boolForKey:@"isCamera"];
-    BOOL isCrop          = [self.cameraOptions sy_boolForKey:@"isCrop"];
+    BOOL cropping          = [self.cameraOptions sy_boolForKey:@"cropping"];
     BOOL isGif           = [self.cameraOptions sy_boolForKey:@"isGif"];
     BOOL showCropCircle  = [self.cameraOptions sy_boolForKey:@"showCropCircle"];
     BOOL isRecordSelected = [self.cameraOptions sy_boolForKey:@"isRecordSelected"];
@@ -203,7 +203,7 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
     imagePickerVc.sortAscendingByModificationDate = sortAscendingByModificationDate;
     imagePickerVc.alwaysEnableDoneBtn = YES;
     imagePickerVc.allowPickingMultipleVideo = isGif ? YES : allowPickingMultipleVideo;
-    imagePickerVc.allowCrop = isCrop;   // 裁剪
+    imagePickerVc.allowCrop = cropping;   // 裁剪
     imagePickerVc.modalPresentationStyle = UIModalPresentationFullScreen;
 
     if (isRecordSelected) {
@@ -214,7 +214,7 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
         // 单选模式
         imagePickerVc.showSelectBtn = NO;
 
-        if(isCrop){
+        if(cropping){
             if(showCropCircle) {
                 imagePickerVc.needCircleCrop = showCropCircle; //圆形裁剪
                 imagePickerVc.circleCropRadius = circleCropRadius; //圆形半径
@@ -232,7 +232,7 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
             self.selectedAssets = [NSMutableArray arrayWithArray:assets];
         }
         [weakPicker showProgressHUD];
-        if (maxSize == 1 && isCrop) {
+        if (maxSize == 1 && cropping) {
             [self invokeSuccessWithResult:@[[self handleCropImage:photos[0] phAsset:assets[0] compressQuality:compressQuality]]];
         } else {
             [infos enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -322,14 +322,14 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
                     [tzImagePickerVc hideProgressHUD];
 
                     TZAssetModel *assetModel = [[TZImageManager manager] createModelWithAsset:asset];
-                    BOOL isCrop          = [self.cameraOptions sy_boolForKey:@"isCrop"];
+                    BOOL cropping          = [self.cameraOptions sy_boolForKey:@"cropping"];
                     BOOL showCropCircle  = [self.cameraOptions sy_boolForKey:@"showCropCircle"];
                     NSInteger CropW      = [self.cameraOptions sy_integerForKey:@"CropW"];
                     NSInteger CropH      = [self.cameraOptions sy_integerForKey:@"CropH"];
                     NSInteger circleCropRadius = [self.cameraOptions sy_integerForKey:@"circleCropRadius"];
                     NSInteger   compressQuality = [self.cameraOptions sy_integerForKey:@"compressQuality"];
 
-                    if (isCrop) {
+                    if (cropping) {
                         TZImagePickerController *imagePicker = [[TZImagePickerController alloc] initCropTypeWithAsset:assetModel.asset photo:image completion:^(UIImage *cropImage, id asset) {
                             [self invokeSuccessWithResult:@[[self handleCropImage:cropImage phAsset:asset compressQuality:compressQuality]]];
                         }];
@@ -441,7 +441,7 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
     NSInteger size = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil].fileSize;
     photo[@"size"] = @(size);
     photo[@"mediaType"] = @(phAsset.mediaType);
-    if ([self.cameraOptions sy_boolForKey:@"enableBase64"]) {
+    if ([self.cameraOptions sy_boolForKey:@"includeBase64"]) {
         photo[@"base64"] = [NSString stringWithFormat:@"data:image/jpeg;base64,%@", [writeData base64EncodedStringWithOptions:0]];
     }
 
@@ -483,7 +483,7 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
     NSInteger size      = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil].fileSize;
     photo[@"size"]      = @(size);
     photo[@"mediaType"] = @(phAsset.mediaType);
-    if ([self.cameraOptions sy_boolForKey:@"enableBase64"] && !isGIF) {
+    if ([self.cameraOptions sy_boolForKey:@"includeBase64"] && !isGIF) {
         photo[@"base64"] = [NSString stringWithFormat:@"data:image/jpeg;base64,%@", [writeData base64EncodedStringWithOptions:0]];
     }
 
