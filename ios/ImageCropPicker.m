@@ -95,11 +95,17 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
     BOOL allowPickingOriginalPhoto = [options sy_boolForKey:@"allowPickingOriginalPhoto"];
     BOOL sortAscendingByModificationDate = [options sy_boolForKey:@"sortAscendingByModificationDate"];
     BOOL showSelectedIndex = [options sy_boolForKey:@"showSelectedIndex"];
+    BOOL multiple          = [options sy_boolForKey:@"multiple"];
     NSInteger CropW      = [options sy_integerForKey:@"CropW"];
     NSInteger CropH      = [options sy_integerForKey:@"CropH"];
     NSInteger circleCropRadius = [options sy_integerForKey:@"circleCropRadius"];
     NSInteger videoMaximumDuration = [options sy_integerForKey:@"videoMaximumDuration"];
     NSInteger   compressQuality  = [self.cameraOptions sy_integerForKey:@"compressQuality"];
+    if(multiple){
+        maxSize = maxSize?maxSize:9
+    }else{
+        maxSize = maxSize?maxSize:1
+    }
 
     TZImagePickerController *imagePickerVc = [[TZImagePickerController alloc] initWithMaxImagesCount:maxSize delegate:self];
 
@@ -189,11 +195,16 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
     BOOL allowPickingMultipleVideo = [self.cameraOptions sy_boolForKey:@"allowPickingMultipleVideo"];
     BOOL sortAscendingByModificationDate = [self.cameraOptions sy_boolForKey:@"sortAscendingByModificationDate"];
     BOOL showSelectedIndex = [self.cameraOptions sy_boolForKey:@"showSelectedIndex"];
+    BOOL multiple          = [options sy_boolForKey:@"multiple"];
     NSInteger CropW      = [self.cameraOptions sy_integerForKey:@"CropW"];
     NSInteger CropH      = [self.cameraOptions sy_integerForKey:@"CropH"];
     NSInteger circleCropRadius = [self.cameraOptions sy_integerForKey:@"circleCropRadius"];
     NSInteger   compressQuality  = [self.cameraOptions sy_integerForKey:@"compressQuality"];
-
+    if(multiple){
+        maxSize = maxSize?maxSize:9
+    }else{
+        maxSize = maxSize?maxSize:1
+    }
     TZImagePickerController *imagePickerVc = [[TZImagePickerController alloc] initWithMaxImagesCount:maxSize delegate:self];
 
     imagePickerVc.maxImagesCount = maxSize;
@@ -437,14 +448,14 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
     NSData *writeData = isPNG ? UIImagePNGRepresentation(image) : UIImageJPEGRepresentation(image, compressQuality/100);
     [writeData writeToFile:filePath atomically:YES];
 
-    photo[@"uri"]       = filePath;
+    photo[@"path"]       = filePath;
     photo[@"width"]     = @(image.size.width);
     photo[@"height"]    = @(image.size.height);
     NSInteger size = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil].fileSize;
     photo[@"size"] = @(size);
     photo[@"mediaType"] = @(phAsset.mediaType);
     if ([self.cameraOptions sy_boolForKey:@"includeBase64"]) {
-        photo[@"base64"] = [NSString stringWithFormat:@"data:image/jpeg;base64,%@", [writeData base64EncodedStringWithOptions:0]];
+        photo[@"data"] = [NSString stringWithFormat:@"data:image/jpeg;base64,%@", [writeData base64EncodedStringWithOptions:0]];
     }
 
     return photo;
@@ -479,14 +490,14 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
 
     [writeData writeToFile:filePath atomically:YES];
 
-    photo[@"uri"]       = filePath;
+    photo[@"path"]       = filePath;
     photo[@"width"]     = @(image.size.width);
     photo[@"height"]    = @(image.size.height);
     NSInteger size      = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil].fileSize;
     photo[@"size"]      = @(size);
     photo[@"mediaType"] = @(phAsset.mediaType);
     if ([self.cameraOptions sy_boolForKey:@"includeBase64"] && !isGIF) {
-        photo[@"base64"] = [NSString stringWithFormat:@"data:image/jpeg;base64,%@", [writeData base64EncodedStringWithOptions:0]];
+        photo[@"data"] = [NSString stringWithFormat:@"data:image/jpeg;base64,%@", [writeData base64EncodedStringWithOptions:0]];
     }
 
     return photo;
@@ -495,7 +506,7 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
 /// 处理视频数据
 - (NSDictionary *)handleVideoData:(NSString *)outputPath asset:(PHAsset *)asset coverImage:(UIImage *)coverImage compressQuality:(CGFloat)compressQuality {
     NSMutableDictionary *video = [NSMutableDictionary dictionary];
-    video[@"uri"] = outputPath;
+    video[@"path"] = outputPath;
     video[@"fileName"] = [asset valueForKey:@"filename"];
     NSInteger size = [[NSFileManager defaultManager] attributesOfItemAtPath:outputPath error:nil].fileSize;
     video[@"size"] = @(size);
@@ -505,7 +516,7 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
     video[@"type"] = @"video";
     video[@"mime"] = @"video/mp4";
     // iOS only
-    video[@"coverUri"] = [self handleCropImage:coverImage phAsset:asset compressQuality:compressQuality][@"uri"];
+    video[@"coverUri"] = [self handleCropImage:coverImage phAsset:asset compressQuality:compressQuality][@"path"];
     video[@"favorite"] = @(asset.favorite);
     video[@"mediaType"] = @(asset.mediaType);
 
