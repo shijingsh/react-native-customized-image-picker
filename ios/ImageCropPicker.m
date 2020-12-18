@@ -68,11 +68,13 @@ RCT_REMAP_METHOD(openCamera,
   [self takePhoto];
 }
 
-RCT_EXPORT_METHOD(clean];
+RCT_EXPORT_METHOD(clean) {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
     [fileManager removeItemAtPath: [NSString stringWithFormat:@"%@ImageCropPicker", NSTemporaryDirectory()] error:nil];
 
-     resolve(nil);
+     //resolve(nil);
 }
+
 
 // openVideoPicker
 RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback) {
