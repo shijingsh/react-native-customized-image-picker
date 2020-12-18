@@ -180,7 +180,7 @@ RCT_REMAP_METHOD(clean,
         [[TZImageManager manager] getVideoOutputPathWithAsset:asset presetName:AVAssetExportPresetHighestQuality success:^(NSString *outputPath) {
             NSLog(@"视频导出成功:%@", outputPath);
             //callback(@[[NSNull null], @[[self handleVideoData:outputPath asset:asset coverImage:coverImage compressQuality:compressQuality]]]);
-            // [self invokeSuccessWithResult:@[[self handleVideoData:outputPath asset:asset coverImage:coverImage compressQuality:compressQuality]]]];
+             [self invokeSuccessWithResult:@[[self handleVideoData:outputPath asset:asset coverImage:coverImage compressQuality:compressQuality]]];
             [weakPicker dismissViewControllerAnimated:YES completion:nil];
             [weakPicker hideProgressHUD];
         } failure:^(NSString *errorMessage, NSError *error) {
