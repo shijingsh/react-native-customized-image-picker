@@ -54,7 +54,15 @@ RCT_REMAP_METHOD(openPicker,
     self.resolveBlock = resolve;
     self.rejectBlock = reject;
     self.callback = nil;
-    [self openImagePicker];
+
+    BOOL isVideo = [options sy_boolForKey:@"isVideo"] || NO;
+    if(!isVideo){
+        [self openImagePicker];
+    }else{
+        [self openVideoPicker];
+    }
+
+
 }
 
 RCT_REMAP_METHOD(openCamera,
@@ -68,39 +76,37 @@ RCT_REMAP_METHOD(openCamera,
   [self takePhoto];
 }
 
-RCT_EXPORT_METHOD(clean) {
+RCT_REMAP_METHOD(clean,
+                     cleanResolver:(RCTPromiseResolveBlock)resolve
+                     rejecter:(RCTPromiseRejectBlock)reject) {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     [fileManager removeItemAtPath: [NSString stringWithFormat:@"%@ImageCropPicker", NSTemporaryDirectory()] error:nil];
 
-     //resolve(nil);
+     resolve(nil);
 }
 
 
-// openVideoPicker
-RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback) {
-    [self openTZImagePicker:options callback:callback];
-}
-
-- (void)openTZImagePicker:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback {
-    NSInteger maxSize = [options sy_integerForKey:@"maxSize"];
-    BOOL isCamera        = [options sy_boolForKey:@"isCamera"];
-    BOOL cropping          = [options sy_boolForKey:@"cropping"];
-    BOOL isGif = [options sy_boolForKey:@"isGif"];
-    BOOL allowPickingVideo = [options sy_boolForKey:@"allowPickingVideo"];
-    BOOL allowPickingMultipleVideo = [options sy_boolForKey:@"allowPickingMultipleVideo"];
-    BOOL allowPickingImage = [options sy_boolForKey:@"allowPickingImage"];
-    BOOL allowTakeVideo = [options sy_boolForKey:@"allowTakeVideo"];
-    BOOL showCropCircle  = [options sy_boolForKey:@"showCropCircle"];
-    BOOL isRecordSelected = [options sy_boolForKey:@"isRecordSelected"];
-    BOOL allowPickingOriginalPhoto = [options sy_boolForKey:@"allowPickingOriginalPhoto"];
-    BOOL sortAscendingByModificationDate = [options sy_boolForKey:@"sortAscendingByModificationDate"];
-    BOOL showSelectedIndex = [options sy_boolForKey:@"showSelectedIndex"];
-    BOOL multiple          = [options sy_boolForKey:@"multiple"];
-    NSInteger CropW      = [options sy_integerForKey:@"CropW"];
-    NSInteger CropH      = [options sy_integerForKey:@"CropH"];
-    NSInteger circleCropRadius = [options sy_integerForKey:@"circleCropRadius"];
-    NSInteger videoMaximumDuration = [options sy_integerForKey:@"videoMaximumDuration"];
+- (void)openVideoPicker {
+    NSInteger maxSize = [self.cameraOptions sy_integerForKey:@"maxSize"];
+    BOOL isCamera        = [self.cameraOptions sy_boolForKey:@"isCamera"];
+    BOOL cropping          = [self.cameraOptions sy_boolForKey:@"cropping"];
+    BOOL isGif = [self.cameraOptions sy_boolForKey:@"isGif"];
+    BOOL allowPickingVideo = [self.cameraOptions sy_boolForKey:@"allowPickingVideo"];
+    BOOL allowPickingMultipleVideo = [self.cameraOptions sy_boolForKey:@"allowPickingMultipleVideo"];
+    BOOL allowPickingImage = [self.cameraOptions sy_boolForKey:@"allowPickingImage"];
+    BOOL allowTakeVideo = [self.cameraOptions sy_boolForKey:@"allowTakeVideo"];
+    BOOL showCropCircle  = [self.cameraOptions sy_boolForKey:@"showCropCircle"];
+    BOOL isRecordSelected = [self.cameraOptions sy_boolForKey:@"isRecordSelected"];
+    BOOL allowPickingOriginalPhoto = [self.cameraOptions sy_boolForKey:@"allowPickingOriginalPhoto"];
+    BOOL sortAscendingByModificationDate = [self.cameraOptions sy_boolForKey:@"sortAscendingByModificationDate"];
+    BOOL showSelectedIndex = [self.cameraOptions sy_boolForKey:@"showSelectedIndex"];
+    BOOL multiple          = [self.cameraOptions sy_boolForKey:@"multiple"];
+    NSInteger CropW      = [self.cameraOptions sy_integerForKey:@"CropW"];
+    NSInteger CropH      = [self.cameraOptions sy_integerForKey:@"CropH"];
+    NSInteger circleCropRadius = [self.cameraOptions sy_integerForKey:@"circleCropRadius"];
+    NSInteger videoMaximumDuration = [self.cameraOptions sy_integerForKey:@"videoMaximumDuration"];
     NSInteger   compressQuality  = [self.cameraOptions sy_integerForKey:@"compressQuality"];
+    BOOL isVideo = YES;
     if(multiple){
         maxSize = maxSize?maxSize:9;
     }else{
@@ -112,11 +118,11 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
     imagePickerVc.maxImagesCount = maxSize;
     imagePickerVc.allowPickingGif = isGif; // 允许GIF
     imagePickerVc.allowTakePicture = isCamera; // 允许用户在内部拍照
-    imagePickerVc.allowPickingVideo = allowPickingVideo; // 不允许视频
+    imagePickerVc.allowPickingVideo = isVideo; // 不允许视频
     imagePickerVc.allowPickingImage = allowPickingImage;
-    imagePickerVc.allowTakeVideo = allowTakeVideo; // 允许拍摄视频
+    imagePickerVc.allowTakeVideo = isCamera; // 允许拍摄视频
     imagePickerVc.videoMaximumDuration = videoMaximumDuration;
-    imagePickerVc.allowPickingMultipleVideo = isGif || allowPickingMultipleVideo ? YES : NO;
+    imagePickerVc.allowPickingMultipleVideo = multiple;
     imagePickerVc.allowPickingOriginalPhoto = allowPickingOriginalPhoto; // 允许原图
     imagePickerVc.sortAscendingByModificationDate = sortAscendingByModificationDate;
     imagePickerVc.alwaysEnableDoneBtn = YES;
@@ -148,7 +154,8 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
     __weak TZImagePickerController *weakPicker = imagePickerVc;
     [imagePickerVc setDidFinishPickingPhotosWithInfosHandle:^(NSArray<UIImage *> *photos,NSArray *assets,BOOL isSelectOriginalPhoto,NSArray<NSDictionary *> *infos) {
         [self handleAssets:assets photos:photos compressQuality:compressQuality isSelectOriginalPhoto:isSelectOriginalPhoto completion:^(NSArray *selecteds) {
-            callback(@[[NSNull null], selecteds]);
+            //callback(@[[NSNull null], selecteds]);
+            [self invokeSuccessWithResult:selecteds];
             [weakPicker dismissViewControllerAnimated:YES completion:nil];
             [weakPicker hideProgressHUD];
         } fail:^(NSError *error) {
@@ -161,12 +168,13 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
         [weakPicker showProgressHUD];
         [[TZImageManager manager] getVideoOutputPathWithAsset:asset presetName:AVAssetExportPresetHighestQuality success:^(NSString *outputPath) {
             NSLog(@"视频导出成功:%@", outputPath);
-            callback(@[[NSNull null], @[[self handleVideoData:outputPath asset:asset coverImage:coverImage compressQuality:compressQuality]]]);
+            //callback(@[[NSNull null], @[[self handleVideoData:outputPath asset:asset coverImage:coverImage compressQuality:compressQuality]]]);
+            // [self invokeSuccessWithResult:@[[self handleVideoData:outputPath asset:asset coverImage:coverImage compressQuality:compressQuality]]]];
             [weakPicker dismissViewControllerAnimated:YES completion:nil];
             [weakPicker hideProgressHUD];
         } failure:^(NSString *errorMessage, NSError *error) {
             NSLog(@"视频导出失败:%@,error:%@",errorMessage, error);
-            callback(@[@"视频导出失败"]);
+            //callback(@[@"视频导出失败"]);
             [weakPicker dismissViewControllerAnimated:YES completion:nil];
             [weakPicker hideProgressHUD];
         }];
@@ -174,7 +182,7 @@ RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseS
 
     __weak TZImagePickerController *weakPickerVc = imagePickerVc;
     [imagePickerVc setImagePickerControllerDidCancelHandle:^{
-        callback(@[@"取消"]);
+        //callback(@[@"取消"]);
         [weakPicker dismissViewControllerAnimated:YES completion:nil];
         [weakPickerVc hideProgressHUD];
     }];
