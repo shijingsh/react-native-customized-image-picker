@@ -1,783 +1,564 @@
-//
-//  ImageManager.m
-//
-//  Created by Ivan Pusic on 5/4/16.
-//  Copyright © 2016 Facebook. All rights reserved.
-//
 
 #import "ImageCropPicker.h"
 
-#define ERROR_PICKER_CANNOT_RUN_CAMERA_ON_SIMULATOR_KEY @"E_PICKER_CANNOT_RUN_CAMERA_ON_SIMULATOR"
-#define ERROR_PICKER_CANNOT_RUN_CAMERA_ON_SIMULATOR_MSG @"Cannot run camera on simulator"
+#import "TZImageManager.h"
+#import "NSDictionary+SYSafeConvert.h"
+#import "TZImageCropManager.h"
+#import <AssetsLibrary/AssetsLibrary.h>
+#import <React/RCTUtils.h>
 
-#define ERROR_PICKER_NO_CAMERA_PERMISSION_KEY @"E_PICKER_NO_CAMERA_PERMISSION"
-#define ERROR_PICKER_NO_CAMERA_PERMISSION_MSG @"User did not grant camera permission."
+@interface ImageCropPicker ()
 
-#define ERROR_PICKER_UNAUTHORIZED_KEY @"E_PERMISSION_MISSING"
-#define ERROR_PICKER_UNAUTHORIZED_MSG @"Cannot access images. Please allow access if you want to be able to select images."
-
-#define ERROR_PICKER_CANCEL_KEY @"E_PICKER_CANCELLED"
-#define ERROR_PICKER_CANCEL_MSG @"User cancelled image selection"
-
-#define ERROR_PICKER_NO_DATA_KEY @"E_NO_IMAGE_DATA_FOUND"
-#define ERROR_PICKER_NO_DATA_MSG @"Cannot find image data"
-
-#define ERROR_CROPPER_IMAGE_NOT_FOUND_KEY @"E_CROPPER_IMAGE_NOT_FOUND"
-#define ERROR_CROPPER_IMAGE_NOT_FOUND_MSG @"Can't find the image at the specified path"
-
-#define ERROR_CLEANUP_ERROR_KEY @"E_ERROR_WHILE_CLEANING_FILES"
-#define ERROR_CLEANUP_ERROR_MSG @"Error while cleaning up tmp files"
-
-#define ERROR_CANNOT_SAVE_IMAGE_KEY @"E_CANNOT_SAVE_IMAGE"
-#define ERROR_CANNOT_SAVE_IMAGE_MSG @"Cannot save image. Unable to write to tmp location."
-
-#define ERROR_CANNOT_PROCESS_VIDEO_KEY @"E_CANNOT_PROCESS_VIDEO"
-#define ERROR_CANNOT_PROCESS_VIDEO_MSG @"Cannot process video data"
-
-@implementation ImageResult
+@property (nonatomic, strong) UIImagePickerController *imagePickerVc;
+@property (nonatomic, strong) NSDictionary *cameraOptions;
+/**
+ 保存Promise的resolve block
+ */
+@property (nonatomic, copy) RCTPromiseResolveBlock resolveBlock;
+/**
+ 保存Promise的reject block
+ */
+@property (nonatomic, copy) RCTPromiseRejectBlock rejectBlock;
+/**
+ 保存回调的callback
+ */
+@property (nonatomic, copy) RCTResponseSenderBlock callback;
+/**
+ 保存选中的图片数组
+ */
+@property (nonatomic, strong) NSMutableArray *selectedAssets;
 @end
 
 @implementation ImageCropPicker
 
-RCT_EXPORT_MODULE();
-
-@synthesize bridge = _bridge;
-
-- (instancetype)init
-{
-    if (self = [super init]) {
-        self.defaultOptions = @{
-                                @"multiple": @NO,
-                                @"cropping": @NO,
-                                @"cropperCircleOverlay": @NO,
-                                @"includeBase64": @NO,
-                                @"includeExif": @NO,
-                                @"compressVideo": @YES,
-                                @"minFiles": @1,
-                                @"maxSize": @9,
-                                @"width": @0,
-                                @"waitAnimationEnd": @YES,
-                                @"height": @0,
-                                @"useFrontCamera": @NO,
-                                @"compressQuality": @100,
-                                @"compressVideoPreset": @"MediumQuality",
-                                @"loadingLabelText": @"Processing assets...",
-                                @"mediaType": @"any",
-                                @"showsSelectedCount": @YES
-                                };
-        self.compression = [[Compression alloc] init];
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _selectedAssets = [NSMutableArray array];
     }
-    
     return self;
 }
 
-+ (BOOL)requiresMainQueueSetup {
-    return YES;
+- (void)dealloc {
+    _selectedAssets = nil;
 }
 
-- (void (^ __nullable)(void))waitAnimationEnd:(void (^ __nullable)(void))completion {
-    if ([[self.options objectForKey:@"waitAnimationEnd"] boolValue]) {
-        return completion;
-    }
-    
-    if (completion != nil) {
-        completion();
-    }
-    
-    return nil;
+RCT_EXPORT_MODULE()
+
+
+RCT_REMAP_METHOD(openPicker,
+                 options:(NSDictionary *)options
+                 showImagePickerResolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject) {
+	self.cameraOptions = options;
+    self.resolveBlock = resolve;
+    self.rejectBlock = reject;
+    self.callback = nil;
+    [self openImagePicker];
 }
 
-- (void)checkCameraPermissions:(void(^)(BOOL granted))callback
-{
-    AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
-    if (status == AVAuthorizationStatusAuthorized) {
-        callback(YES);
-        return;
-    } else if (status == AVAuthorizationStatusNotDetermined){
+RCT_REMAP_METHOD(openCamera,
+                 options:(NSDictionary *)options
+                 openCameraResolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject) {
+  self.cameraOptions = options;
+  self.resolveBlock = resolve;
+  self.rejectBlock = reject;
+  self.callback = nil;
+  [self takePhoto];
+}
+
+RCT_EXPORT_METHOD(clean,resolver:(RCTPromiseResolveBlock)resolve
+                                         rejecter:(RCTPromiseRejectBlock)reject) {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    [fileManager removeItemAtPath: [NSString stringWithFormat:@"%@ImageCropPicker", NSTemporaryDirectory()] error:nil];
+
+     resolve(nil);
+}
+
+// openVideoPicker
+RCT_EXPORT_METHOD(openVideoPicker:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback) {
+    [self openTZImagePicker:options callback:callback];
+}
+
+- (void)openTZImagePicker:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback {
+    NSInteger maxSize = [options sy_integerForKey:@"maxSize"];
+    BOOL isCamera        = [options sy_boolForKey:@"isCamera"];
+    BOOL isCrop          = [options sy_boolForKey:@"isCrop"];
+    BOOL isGif = [options sy_boolForKey:@"isGif"];
+    BOOL allowPickingVideo = [options sy_boolForKey:@"allowPickingVideo"];
+    BOOL allowPickingMultipleVideo = [options sy_boolForKey:@"allowPickingMultipleVideo"];
+    BOOL allowPickingImage = [options sy_boolForKey:@"allowPickingImage"];
+    BOOL allowTakeVideo = [options sy_boolForKey:@"allowTakeVideo"];
+    BOOL showCropCircle  = [options sy_boolForKey:@"showCropCircle"];
+    BOOL isRecordSelected = [options sy_boolForKey:@"isRecordSelected"];
+    BOOL allowPickingOriginalPhoto = [options sy_boolForKey:@"allowPickingOriginalPhoto"];
+    BOOL sortAscendingByModificationDate = [options sy_boolForKey:@"sortAscendingByModificationDate"];
+    BOOL showSelectedIndex = [options sy_boolForKey:@"showSelectedIndex"];
+    NSInteger CropW      = [options sy_integerForKey:@"CropW"];
+    NSInteger CropH      = [options sy_integerForKey:@"CropH"];
+    NSInteger circleCropRadius = [options sy_integerForKey:@"circleCropRadius"];
+    NSInteger videoMaximumDuration = [options sy_integerForKey:@"videoMaximumDuration"];
+    NSInteger   compressQuality  = [self.cameraOptions sy_integerForKey:@"compressQuality"];
+
+    TZImagePickerController *imagePickerVc = [[TZImagePickerController alloc] initWithMaxImagesCount:maxSize delegate:self];
+
+    imagePickerVc.maxImagesCount = maxSize;
+    imagePickerVc.allowPickingGif = isGif; // 允许GIF
+    imagePickerVc.allowTakePicture = isCamera; // 允许用户在内部拍照
+    imagePickerVc.allowPickingVideo = allowPickingVideo; // 不允许视频
+    imagePickerVc.allowPickingImage = allowPickingImage;
+    imagePickerVc.allowTakeVideo = allowTakeVideo; // 允许拍摄视频
+    imagePickerVc.videoMaximumDuration = videoMaximumDuration;
+    imagePickerVc.allowPickingMultipleVideo = isGif || allowPickingMultipleVideo ? YES : NO;
+    imagePickerVc.allowPickingOriginalPhoto = allowPickingOriginalPhoto; // 允许原图
+    imagePickerVc.sortAscendingByModificationDate = sortAscendingByModificationDate;
+    imagePickerVc.alwaysEnableDoneBtn = YES;
+    imagePickerVc.allowCrop = isCrop;   // 裁剪
+    imagePickerVc.autoDismiss = NO;
+    imagePickerVc.showSelectedIndex = showSelectedIndex;
+    imagePickerVc.modalPresentationStyle = UIModalPresentationFullScreen;
+
+    if (isRecordSelected) {
+        imagePickerVc.selectedAssets = self.selectedAssets; // 当前已选中的图片
+    }
+
+    if (maxSize == 1) {
+        // 单选模式
+        imagePickerVc.showSelectBtn = NO;
+
+        if(isCrop){
+            if(showCropCircle) {
+                imagePickerVc.needCircleCrop = showCropCircle; //圆形裁剪
+                imagePickerVc.circleCropRadius = circleCropRadius; //圆形半径
+            } else {
+                CGFloat x = ([[UIScreen mainScreen] bounds].size.width - CropW) / 2;
+                CGFloat y = ([[UIScreen mainScreen] bounds].size.height - CropH) / 2;
+                imagePickerVc.cropRect = CGRectMake(x,y,CropW,CropH);
+            }
+        }
+    }
+
+    __weak TZImagePickerController *weakPicker = imagePickerVc;
+    [imagePickerVc setDidFinishPickingPhotosWithInfosHandle:^(NSArray<UIImage *> *photos,NSArray *assets,BOOL isSelectOriginalPhoto,NSArray<NSDictionary *> *infos) {
+        [self handleAssets:assets photos:photos compressQuality:compressQuality isSelectOriginalPhoto:isSelectOriginalPhoto completion:^(NSArray *selecteds) {
+            callback(@[[NSNull null], selecteds]);
+            [weakPicker dismissViewControllerAnimated:YES completion:nil];
+            [weakPicker hideProgressHUD];
+        } fail:^(NSError *error) {
+            [weakPicker dismissViewControllerAnimated:YES completion:nil];
+            [weakPicker hideProgressHUD];
+        }];
+    }];
+
+    [imagePickerVc setDidFinishPickingVideoHandle:^(UIImage *coverImage, PHAsset *asset) {
+        [weakPicker showProgressHUD];
+        [[TZImageManager manager] getVideoOutputPathWithAsset:asset presetName:AVAssetExportPresetHighestQuality success:^(NSString *outputPath) {
+            NSLog(@"视频导出成功:%@", outputPath);
+            callback(@[[NSNull null], @[[self handleVideoData:outputPath asset:asset coverImage:coverImage compressQuality:compressQuality]]]);
+            [weakPicker dismissViewControllerAnimated:YES completion:nil];
+            [weakPicker hideProgressHUD];
+        } failure:^(NSString *errorMessage, NSError *error) {
+            NSLog(@"视频导出失败:%@,error:%@",errorMessage, error);
+            callback(@[@"视频导出失败"]);
+            [weakPicker dismissViewControllerAnimated:YES completion:nil];
+            [weakPicker hideProgressHUD];
+        }];
+    }];
+
+    __weak TZImagePickerController *weakPickerVc = imagePickerVc;
+    [imagePickerVc setImagePickerControllerDidCancelHandle:^{
+        callback(@[@"取消"]);
+        [weakPicker dismissViewControllerAnimated:YES completion:nil];
+        [weakPickerVc hideProgressHUD];
+    }];
+
+    [[self topViewController] presentViewController:imagePickerVc animated:YES completion:nil];
+}
+
+- (void)openImagePicker {
+    // 照片最大可选张数
+    NSInteger maxSize = [self.cameraOptions sy_integerForKey:@"maxSize"];
+    // 显示内部拍照按钮
+    BOOL isCamera        = [self.cameraOptions sy_boolForKey:@"isCamera"];
+    BOOL isCrop          = [self.cameraOptions sy_boolForKey:@"isCrop"];
+    BOOL isGif           = [self.cameraOptions sy_boolForKey:@"isGif"];
+    BOOL showCropCircle  = [self.cameraOptions sy_boolForKey:@"showCropCircle"];
+    BOOL isRecordSelected = [self.cameraOptions sy_boolForKey:@"isRecordSelected"];
+    BOOL allowPickingOriginalPhoto = [self.cameraOptions sy_boolForKey:@"allowPickingOriginalPhoto"];
+    BOOL allowPickingMultipleVideo = [self.cameraOptions sy_boolForKey:@"allowPickingMultipleVideo"];
+    BOOL sortAscendingByModificationDate = [self.cameraOptions sy_boolForKey:@"sortAscendingByModificationDate"];
+    BOOL showSelectedIndex = [self.cameraOptions sy_boolForKey:@"showSelectedIndex"];
+    NSInteger CropW      = [self.cameraOptions sy_integerForKey:@"CropW"];
+    NSInteger CropH      = [self.cameraOptions sy_integerForKey:@"CropH"];
+    NSInteger circleCropRadius = [self.cameraOptions sy_integerForKey:@"circleCropRadius"];
+    NSInteger   compressQuality  = [self.cameraOptions sy_integerForKey:@"compressQuality"];
+
+    TZImagePickerController *imagePickerVc = [[TZImagePickerController alloc] initWithMaxImagesCount:maxSize delegate:self];
+
+    imagePickerVc.maxImagesCount = maxSize;
+    imagePickerVc.allowPickingGif = isGif; // 允许GIF
+    imagePickerVc.allowTakePicture = isCamera; // 允许用户在内部拍照
+    imagePickerVc.allowPickingVideo = NO; // 不允许视频
+    imagePickerVc.showSelectedIndex = showSelectedIndex;
+    imagePickerVc.allowPickingOriginalPhoto = allowPickingOriginalPhoto; // 允许原图
+    imagePickerVc.sortAscendingByModificationDate = sortAscendingByModificationDate;
+    imagePickerVc.alwaysEnableDoneBtn = YES;
+    imagePickerVc.allowPickingMultipleVideo = isGif ? YES : allowPickingMultipleVideo;
+    imagePickerVc.allowCrop = isCrop;   // 裁剪
+    imagePickerVc.modalPresentationStyle = UIModalPresentationFullScreen;
+
+    if (isRecordSelected) {
+        imagePickerVc.selectedAssets = self.selectedAssets; // 当前已选中的图片
+    }
+
+    if (maxSize == 1) {
+        // 单选模式
+        imagePickerVc.showSelectBtn = NO;
+
+        if(isCrop){
+            if(showCropCircle) {
+                imagePickerVc.needCircleCrop = showCropCircle; //圆形裁剪
+                imagePickerVc.circleCropRadius = circleCropRadius; //圆形半径
+            } else {
+                CGFloat x = ([[UIScreen mainScreen] bounds].size.width - CropW) / 2;
+                CGFloat y = ([[UIScreen mainScreen] bounds].size.height - CropH) / 2;
+                imagePickerVc.cropRect = CGRectMake(x,y,CropW,CropH);
+            }
+        }
+    }
+
+    __weak TZImagePickerController *weakPicker = imagePickerVc;
+    [imagePickerVc setDidFinishPickingPhotosWithInfosHandle:^(NSArray<UIImage *> *photos,NSArray *assets,BOOL isSelectOriginalPhoto,NSArray<NSDictionary *> *infos) {
+        if (isRecordSelected) {
+            self.selectedAssets = [NSMutableArray arrayWithArray:assets];
+        }
+        [weakPicker showProgressHUD];
+        if (maxSize == 1 && isCrop) {
+            [self invokeSuccessWithResult:@[[self handleCropImage:photos[0] phAsset:assets[0] compressQuality:compressQuality]]];
+        } else {
+            [infos enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                [self handleAssets:assets photos:photos compressQuality:compressQuality isSelectOriginalPhoto:isSelectOriginalPhoto completion:^(NSArray *selecteds) {
+                    [self invokeSuccessWithResult:selecteds];
+                } fail:^(NSError *error) {
+
+                }];
+            }];
+        }
+        [weakPicker hideProgressHUD];
+    }];
+
+    __weak TZImagePickerController *weakPickerVc = imagePickerVc;
+    [imagePickerVc setImagePickerControllerDidCancelHandle:^{
+        [self invokeError];
+        [weakPickerVc hideProgressHUD];
+    }];
+
+    [[self topViewController] presentViewController:imagePickerVc animated:YES completion:nil];
+}
+
+- (UIImagePickerController *)imagePickerVc {
+    if (_imagePickerVc == nil) {
+        _imagePickerVc = [[UIImagePickerController alloc] init];
+        _imagePickerVc.delegate = self;
+    }
+    return _imagePickerVc;
+}
+
+#pragma mark - UIImagePickerController
+- (void)takePhoto {
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if (authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied) {
+        // 无相机权限 做一个友好的提示
+        UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"无法使用相机" message:@"请在iPhone的""设置-隐私-相机""中允许访问相机" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"设置", nil];
+        [alert show];
+    } else if (authStatus == AVAuthorizationStatusNotDetermined) {
+        // fix issue 466, 防止用户首次拍照拒绝授权时相机页黑屏
         [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
-            callback(granted);
-            return;
+            if (granted) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self takePhoto];
+                });
+            }
+        }];
+        // 拍照之前还需要检查相册权限
+    } else if ([PHPhotoLibrary authorizationStatus] == 2) { // 已被拒绝，没有相册权限，将无法保存拍的照片
+        UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"无法访问相册" message:@"请在iPhone的""设置-隐私-相册""中允许访问相册" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"设置", nil];
+        [alert show];
+    } else if ([PHPhotoLibrary authorizationStatus] == 0) { // 未请求过相册权限
+        [[TZImageManager manager] requestAuthorizationWithCompletion:^{
+            [self takePhoto];
         }];
     } else {
-        callback(NO);
+        [self pushImagePickerController];
     }
 }
 
-- (void) setConfiguration:(NSDictionary *)options
-                 resolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject {
-    
-    self.resolve = resolve;
-    self.reject = reject;
-    self.options = [NSMutableDictionary dictionaryWithDictionary:self.defaultOptions];
-    for (NSString *key in options.keyEnumerator) {
-        [self.options setValue:options[key] forKey:key];
+// 调用相机
+- (void)pushImagePickerController {
+    UIImagePickerControllerSourceType sourceType = UIImagePickerControllerSourceTypeCamera;
+    if ([UIImagePickerController isSourceTypeAvailable: UIImagePickerControllerSourceTypeCamera]) {
+        self.imagePickerVc.sourceType = sourceType;
+        [[self topViewController] presentViewController:self.imagePickerVc animated:YES completion:nil];
+    } else {
+        NSLog(@"模拟器中无法打开照相机,请在真机中使用");
     }
 }
 
-- (UIViewController*) getRootVC {
-    UIViewController *root = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
-    while (root.presentedViewController != nil) {
-        root = root.presentedViewController;
-    }
-    
-    return root;
-}
+- (void)imagePickerController:(UIImagePickerController*)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    [picker dismissViewControllerAnimated:YES completion:^{
+        NSString *type = [info objectForKey:UIImagePickerControllerMediaType];
+        if ([type isEqualToString:@"public.image"]) {
 
-RCT_EXPORT_METHOD(openCamera:(NSDictionary *)options
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-    
-    [self setConfiguration:options resolver:resolve rejecter:reject];
-    self.currentSelectionMode = CAMERA;
-    
-#if TARGET_IPHONE_SIMULATOR
-    self.reject(ERROR_PICKER_CANNOT_RUN_CAMERA_ON_SIMULATOR_KEY, ERROR_PICKER_CANNOT_RUN_CAMERA_ON_SIMULATOR_MSG, nil);
-    return;
-#else
-    [self checkCameraPermissions:^(BOOL granted) {
-        if (!granted) {
-            self.reject(ERROR_PICKER_NO_CAMERA_PERMISSION_KEY, ERROR_PICKER_NO_CAMERA_PERMISSION_MSG, nil);
-            return;
+            TZImagePickerController *tzImagePickerVc = [[TZImagePickerController alloc] initWithMaxImagesCount:1 delegate:nil];
+            tzImagePickerVc.sortAscendingByModificationDate = NO;
+            [tzImagePickerVc showProgressHUD];
+            UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+
+            // save photo and get asset / 保存图片，获取到asset
+            [[TZImageManager manager] savePhotoWithImage:image location:NULL completion:^(PHAsset *asset, NSError *error){
+                if (error) {
+                    [tzImagePickerVc hideProgressHUD];
+                    NSLog(@"图片保存失败 %@",error);
+                } else {
+                    [tzImagePickerVc hideProgressHUD];
+
+                    TZAssetModel *assetModel = [[TZImageManager manager] createModelWithAsset:asset];
+                    BOOL isCrop          = [self.cameraOptions sy_boolForKey:@"isCrop"];
+                    BOOL showCropCircle  = [self.cameraOptions sy_boolForKey:@"showCropCircle"];
+                    NSInteger CropW      = [self.cameraOptions sy_integerForKey:@"CropW"];
+                    NSInteger CropH      = [self.cameraOptions sy_integerForKey:@"CropH"];
+                    NSInteger circleCropRadius = [self.cameraOptions sy_integerForKey:@"circleCropRadius"];
+                    NSInteger   compressQuality = [self.cameraOptions sy_integerForKey:@"compressQuality"];
+
+                    if (isCrop) {
+                        TZImagePickerController *imagePicker = [[TZImagePickerController alloc] initCropTypeWithAsset:assetModel.asset photo:image completion:^(UIImage *cropImage, id asset) {
+                            [self invokeSuccessWithResult:@[[self handleCropImage:cropImage phAsset:asset compressQuality:compressQuality]]];
+                        }];
+                        imagePicker.allowPickingImage = YES;
+                        if(showCropCircle) {
+                            imagePicker.needCircleCrop = showCropCircle; //圆形裁剪
+                            imagePicker.circleCropRadius = circleCropRadius; //圆形半径
+                        } else {
+                            CGFloat x = ([[UIScreen mainScreen] bounds].size.width - CropW) / 2;
+                            CGFloat y = ([[UIScreen mainScreen] bounds].size.height - CropH) / 2;
+                            imagePicker.cropRect = CGRectMake(x,y,CropW,CropH);
+                        }
+                        [[self topViewController] presentViewController:imagePicker animated:YES completion:nil];
+                    } else {
+                        [self invokeSuccessWithResult:@[[self handleCropImage:image phAsset:asset compressQuality:compressQuality]]];
+                    }
+                }
+            }];
         }
-        
-        UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-        picker.delegate = self;
-        picker.allowsEditing = NO;
-        picker.sourceType = UIImagePickerControllerSourceTypeCamera;
-        if ([[self.options objectForKey:@"useFrontCamera"] boolValue]) {
-            picker.cameraDevice = UIImagePickerControllerCameraDeviceFront;
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[self getRootVC] presentViewController:picker animated:YES completion:nil];
-        });
     }];
-#endif
-}
-
-- (void)viewDidLoad {
-    [self viewDidLoad];
-}
-
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    UIImage *chosenImage = [info objectForKey:UIImagePickerControllerOriginalImage];
-    UIImage *chosenImageT = [chosenImage fixOrientation];
-    
-    NSDictionary *exif;
-    if([[self.options objectForKey:@"includeExif"] boolValue]) {
-        exif = [info objectForKey:UIImagePickerControllerMediaMetadata];
-    }
-    
-    [self processSingleImagePick:chosenImageT withExif:exif withViewController:picker withSourceURL:self.croppingFile[@"sourceURL"] withLocalIdentifier:self.croppingFile[@"localIdentifier"] withFilename:self.croppingFile[@"filename"]];
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    [picker dismissViewControllerAnimated:YES completion:[self waitAnimationEnd:^{
-        self.reject(ERROR_PICKER_CANCEL_KEY, ERROR_PICKER_CANCEL_MSG, nil);
-    }]];
+    [self invokeError];
+    if ([picker isKindOfClass:[UIImagePickerController class]]) {
+        [picker dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 
-- (NSString*) getTmpDirectory {
-    NSString *TMP_DIRECTORY = @"react-native-customized-image-picker/";
-    NSString *tmpFullPath = [NSTemporaryDirectory() stringByAppendingString:TMP_DIRECTORY];
-    
-    BOOL isDir;
-    BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:tmpFullPath isDirectory:&isDir];
-    if (!exists) {
-        [[NSFileManager defaultManager] createDirectoryAtPath: tmpFullPath
-                                  withIntermediateDirectories:YES attributes:nil error:nil];
+#pragma mark - UIAlertViewDelegate
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == 1) { // 去设置界面，开启相机访问权限
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
     }
-    
-    return tmpFullPath;
 }
 
-- (BOOL)cleanTmpDirectory {
-    NSString* tmpDirectoryPath = [self getTmpDirectory];
-    NSArray* tmpDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:tmpDirectoryPath error:NULL];
-    
-    for (NSString *file in tmpDirectory) {
-        BOOL deleted = [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@%@", tmpDirectoryPath, file] error:NULL];
-        
-        if (!deleted) {
-            return NO;
-        }
+- (BOOL)isAssetCanSelect:(PHAsset *)asset {
+    BOOL allowPickingGif = [self.cameraOptions sy_boolForKey:@"isGif"];
+    BOOL isGIF = [[TZImageManager manager] getAssetType:asset] == TZAssetModelMediaTypePhotoGif;
+    if (!allowPickingGif && isGIF) {
+        return NO;
     }
-    
     return YES;
 }
 
-RCT_EXPORT_METHOD(cleanSingle:(NSString *) path
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-    
-    BOOL deleted = [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
-    
-    if (!deleted) {
-        reject(ERROR_CLEANUP_ERROR_KEY, ERROR_CLEANUP_ERROR_MSG, nil);
-    } else {
-        resolve(nil);
-    }
-}
+/// 异步处理获取图片
+- (void)handleAssets:(NSArray *)assets photos:(NSArray*)photos compressQuality:(CGFloat)compressQuality isSelectOriginalPhoto:(BOOL)isSelectOriginalPhoto completion:(void (^)(NSArray *selecteds))completion fail:(void(^)(NSError *error))fail {
+    NSMutableArray *selectedPhotos = [NSMutableArray array];
 
-RCT_REMAP_METHOD(clean, resolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject) {
-    if (![self cleanTmpDirectory]) {
-        reject(ERROR_CLEANUP_ERROR_KEY, ERROR_CLEANUP_ERROR_MSG, nil);
-    } else {
-        resolve(nil);
-    }
-}
-
-RCT_EXPORT_METHOD(openPicker:(NSDictionary *)options
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-    
-    [self setConfiguration:options resolver:resolve rejecter:reject];
-    self.currentSelectionMode = PICKER;
-    
-    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-        if (status != PHAuthorizationStatusAuthorized) {
-            self.reject(ERROR_PICKER_UNAUTHORIZED_KEY, ERROR_PICKER_UNAUTHORIZED_MSG, nil);
-            return;
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            // init picker
-            QBImagePickerController *imagePickerController =
-            [QBImagePickerController new];
-            imagePickerController.delegate = self;
-            imagePickerController.allowsMultipleSelection = [[self.options objectForKey:@"multiple"] boolValue];
-            imagePickerController.minimumNumberOfSelection = abs([[self.options objectForKey:@"minFiles"] intValue]);
-            imagePickerController.maximumNumberOfSelection = abs([[self.options objectForKey:@"maxSize"] intValue]);
-            imagePickerController.showsNumberOfSelectedAssets = [[self.options objectForKey:@"showsSelectedCount"] boolValue];
-            
-            if ([self.options objectForKey:@"smartAlbums"] != nil) {
-                NSDictionary *smartAlbums = @{
-                                              @"UserLibrary" : @(PHAssetCollectionSubtypeSmartAlbumUserLibrary),
-                                              @"PhotoStream" : @(PHAssetCollectionSubtypeAlbumMyPhotoStream),
-                                              @"Panoramas" : @(PHAssetCollectionSubtypeSmartAlbumPanoramas),
-                                              @"Videos" : @(PHAssetCollectionSubtypeSmartAlbumVideos),
-                                              @"Bursts" : @(PHAssetCollectionSubtypeSmartAlbumBursts),
-                                              };
-                NSMutableArray *albumsToShow = [NSMutableArray arrayWithCapacity:5];
-                for (NSString* album in [self.options objectForKey:@"smartAlbums"]) {
-                    if ([smartAlbums objectForKey:album] != nil) {
-                        [albumsToShow addObject:[smartAlbums objectForKey:album]];
-                    }
+    [assets enumerateObjectsUsingBlock:^(PHAsset * _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (asset.mediaType == PHAssetMediaTypeVideo) {
+            [[TZImageManager manager] getVideoOutputPathWithAsset:asset presetName:AVAssetExportPresetHighestQuality success:^(NSString *outputPath) {
+                [selectedPhotos addObject:[self handleVideoData:outputPath asset:asset coverImage:photos[idx] compressQuality:compressQuality]];
+                if ([selectedPhotos count] == [assets count]) {
+                    completion(selectedPhotos);
                 }
-                imagePickerController.assetCollectionSubtypes = albumsToShow;
-            }
-            
-            if ([[self.options objectForKey:@"cropping"] boolValue]) {
-                imagePickerController.mediaType = QBImagePickerMediaTypeImage;
-            } else {
-                NSString *mediaType = [self.options objectForKey:@"mediaType"];
-                
-                if ([mediaType isEqualToString:@"any"]) {
-                    imagePickerController.mediaType = QBImagePickerMediaTypeAny;
-                } else if ([mediaType isEqualToString:@"photo"]) {
-                    imagePickerController.mediaType = QBImagePickerMediaTypeImage;
-                } else {
-                    imagePickerController.mediaType = QBImagePickerMediaTypeVideo;
+                if (idx + 1 == [assets count] && [selectedPhotos count] != [assets count]) {
+                    fail(nil);
                 }
-                
-            }
-            
-            [[self getRootVC] presentViewController:imagePickerController animated:YES completion:nil];
-            
-            
-        });
-    }];
-}
+            } failure:^(NSString *errorMessage, NSError *error) {
 
-RCT_EXPORT_METHOD(openCropper:(NSDictionary *)options
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-    
-    [self setConfiguration:options resolver:resolve rejecter:reject];
-    self.currentSelectionMode = CROPPING;
-    
-    NSString *path = [options objectForKey:@"path"];
-    
-    [self.bridge.imageLoader loadImageWithURLRequest:[RCTConvert NSURLRequest:path] callback:^(NSError *error, UIImage *image) {
-        if (error) {
-            self.reject(ERROR_CROPPER_IMAGE_NOT_FOUND_KEY, ERROR_CROPPER_IMAGE_NOT_FOUND_MSG, nil);
+            }];
         } else {
-            [self startCropping:image];
-        }
-    }];
-}
+            BOOL isGIF = [[TZImageManager manager] getAssetType:asset] == TZAssetModelMediaTypePhotoGif;
+            if (isGIF || isSelectOriginalPhoto) {
+               [[TZImageManager manager] requestImageDataForAsset:asset completion:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
+                   [selectedPhotos addObject:[self handleOriginalPhotoData:imageData phAsset:asset isGIF:isGIF compressQuality:compressQuality]];
+                   if ([selectedPhotos count] == [assets count]) {
+                       completion(selectedPhotos);
+                   }
+                   if (idx + 1 == [assets count] && [selectedPhotos count] != [assets count]) {
+                       fail(nil);
+                   }
+                } progressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
 
-- (void)startCropping:(UIImage *)image {
-    RSKImageCropViewController *imageCropVC = [[RSKImageCropViewController alloc] initWithImage:image];
-    if ([[[self options] objectForKey:@"cropperCircleOverlay"] boolValue]) {
-        imageCropVC.cropMode = RSKImageCropModeCircle;
-    } else {
-        imageCropVC.cropMode = RSKImageCropModeCustom;
-    }
-    imageCropVC.avoidEmptySpaceAroundImage = YES;
-    imageCropVC.dataSource = self;
-    imageCropVC.delegate = self;
-    [imageCropVC setModalPresentationStyle:UIModalPresentationCustom];
-    [imageCropVC setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[self getRootVC] presentViewController:imageCropVC animated:YES completion:nil];
-    });
-}
-
-- (void)showActivityIndicator:(void (^)(UIActivityIndicatorView*, UIView*))handler {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        UIView *mainView = [[self getRootVC] view];
-        
-        // create overlay
-        UIView *loadingView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-        loadingView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
-        loadingView.clipsToBounds = YES;
-        
-        // create loading spinner
-        UIActivityIndicatorView *activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-        activityView.frame = CGRectMake(65, 40, activityView.bounds.size.width, activityView.bounds.size.height);
-        activityView.center = loadingView.center;
-        [loadingView addSubview:activityView];
-        
-        // create message
-        UILabel *loadingLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 115, 130, 22)];
-        loadingLabel.backgroundColor = [UIColor clearColor];
-        loadingLabel.textColor = [UIColor whiteColor];
-        loadingLabel.adjustsFontSizeToFitWidth = YES;
-        CGPoint loadingLabelLocation = loadingView.center;
-        loadingLabelLocation.y += [activityView bounds].size.height;
-        loadingLabel.center = loadingLabelLocation;
-        loadingLabel.textAlignment = NSTextAlignmentCenter;
-        loadingLabel.text = [self.options objectForKey:@"loadingLabelText"];
-        [loadingLabel setFont:[UIFont boldSystemFontOfSize:18]];
-        [loadingView addSubview:loadingLabel];
-        
-        // show all
-        [mainView addSubview:loadingView];
-        [activityView startAnimating];
-        
-        handler(activityView, loadingView);
-    });
-}
-
-
-- (void) getVideoAsset:(PHAsset*)forAsset completion:(void (^)(NSDictionary* image))completion {
-    PHImageManager *manager = [PHImageManager defaultManager];
-    PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
-    options.version = PHVideoRequestOptionsVersionOriginal;
-    
-    [manager
-     requestAVAssetForVideo:forAsset
-     options:options
-     resultHandler:^(AVAsset * asset, AVAudioMix * audioMix,
-                     NSDictionary *info) {
-         NSURL *sourceURL = [(AVURLAsset *)asset URL];
-         
-         // create temp file
-         NSString *tmpDirFullPath = [self getTmpDirectory];
-         NSString *filePath = [tmpDirFullPath stringByAppendingString:[[NSUUID UUID] UUIDString]];
-         filePath = [filePath stringByAppendingString:@".mp4"];
-         NSURL *outputURL = [NSURL fileURLWithPath:filePath];
-         
-         [self.compression compressVideo:sourceURL outputURL:outputURL withOptions:self.options handler:^(AVAssetExportSession *exportSession) {
-             if (exportSession.status == AVAssetExportSessionStatusCompleted) {
-                 AVAsset *compressedAsset = [AVAsset assetWithURL:outputURL];
-                 AVAssetTrack *track = [[compressedAsset tracksWithMediaType:AVMediaTypeVideo] firstObject];
-                 
-                 NSNumber *fileSizeValue = nil;
-                 [outputURL getResourceValue:&fileSizeValue
-                                      forKey:NSURLFileSizeKey
-                                       error:nil];
-                 
-                 completion([self createAttachmentResponse:[outputURL absoluteString]
-                                                  withExif:nil
-                                             withSourceURL:[sourceURL absoluteString]
-                                       withLocalIdentifier: forAsset.localIdentifier
-                                              withFilename:[forAsset valueForKey:@"filename"]
-                                                 withWidth:[NSNumber numberWithFloat:track.naturalSize.width]
-                                                withHeight:[NSNumber numberWithFloat:track.naturalSize.height]
-                                                  withMime:@"video/mp4"
-                                                  withSize:fileSizeValue
-                                                  withData:nil]);
-             } else {
-                 completion(nil);
-             }
-         }];
-     }];
-}
-
-- (NSDictionary*) createAttachmentResponse:(NSString*)filePath withExif:(NSDictionary*) exif withSourceURL:(NSString*)sourceURL withLocalIdentifier:(NSString*)localIdentifier withFilename:(NSString*)filename withWidth:(NSNumber*)width withHeight:(NSNumber*)height withMime:(NSString*)mime withSize:(NSNumber*)size withData:(NSString*)data {
-    return @{
-             @"path": filePath,
-             @"sourceURL": (sourceURL) ? sourceURL : [NSNull null],
-             @"localIdentifier": (localIdentifier) ? localIdentifier : [NSNull null],
-             @"filename": (filename) ? filename : [NSNull null],
-             @"width": width,
-             @"height": height,
-             @"mime": mime,
-             @"size": size,
-             @"data": (data) ? data : [NSNull null],
-             @"exif": (exif) ? exif : [NSNull null],
-             };
-}
-
-- (void)qb_imagePickerController:
-(QBImagePickerController *)imagePickerController
-          didFinishPickingAssets:(NSArray *)assets {
-    
-    PHImageManager *manager = [PHImageManager defaultManager];
-    PHImageRequestOptions* options = [[PHImageRequestOptions alloc] init];
-    options.synchronous = NO;
-    options.networkAccessAllowed = YES;
-    
-    if ([[[self options] objectForKey:@"multiple"] boolValue]) {
-        NSMutableArray *selections = [[NSMutableArray alloc] init];
-        
-        [self showActivityIndicator:^(UIActivityIndicatorView *indicatorView, UIView *overlayView) {
-            NSLock *lock = [[NSLock alloc] init];
-            __block int processed = 0;
-            
-            for (PHAsset *phAsset in assets) {
-                
-                if (phAsset.mediaType == PHAssetMediaTypeVideo) {
-                    [self getVideoAsset:phAsset completion:^(NSDictionary* video) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [lock lock];
-                            
-                            if (video == nil) {
-                                [indicatorView stopAnimating];
-                                [overlayView removeFromSuperview];
-                                [imagePickerController dismissViewControllerAnimated:YES completion:[self waitAnimationEnd:^{
-                                    self.reject(ERROR_CANNOT_PROCESS_VIDEO_KEY, ERROR_CANNOT_PROCESS_VIDEO_MSG, nil);
-                                }]];
-                                return;
-                            }
-                            
-                            [selections addObject:video];
-                            processed++;
-                            [lock unlock];
-                            
-                            if (processed == [assets count]) {
-                                [indicatorView stopAnimating];
-                                [overlayView removeFromSuperview];
-                                [imagePickerController dismissViewControllerAnimated:YES completion:[self waitAnimationEnd:^{
-                                    self.resolve(selections);
-                                }]];
-                                return;
-                            }
-                        });
-                    }];
-                } else {
-                    [manager
-                     requestImageDataForAsset:phAsset
-                     options:options
-                     resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
-                         
-                         NSURL *sourceURL = [info objectForKey:@"PHImageFileURLKey"];
-                         
-                         dispatch_async(dispatch_get_main_queue(), ^{
-                             [lock lock];
-                             @autoreleasepool {
-                                 UIImage *imgT = [UIImage imageWithData:imageData];
-                                 UIImage *imageT = [imgT fixOrientation];
-                                 
-                                 ImageResult *imageResult = [self.compression compressImage:imageT withOptions:self.options];
-                                 NSString *filePath = [self persistFile:imageResult.data];
-                                 
-                                 if (filePath == nil) {
-                                     [indicatorView stopAnimating];
-                                     [overlayView removeFromSuperview];
-                                     [imagePickerController dismissViewControllerAnimated:YES completion:[self waitAnimationEnd:^{
-                                         self.reject(ERROR_CANNOT_SAVE_IMAGE_KEY, ERROR_CANNOT_SAVE_IMAGE_MSG, nil);
-                                     }]];
-                                     return;
-                                 }
-                                 
-                                 NSDictionary* exif = nil;
-                                 if([[self.options objectForKey:@"includeExif"] boolValue]) {
-                                     exif = [[CIImage imageWithData:imageData] properties];
-                                 }
-                                 
-                                 [selections addObject:[self createAttachmentResponse:filePath
-                                                                             withExif: exif
-                                                                        withSourceURL:[sourceURL absoluteString]
-                                                                  withLocalIdentifier: phAsset.localIdentifier
-                                                                         withFilename: [phAsset valueForKey:@"filename"]
-                                                                            withWidth:imageResult.width
-                                                                           withHeight:imageResult.height
-                                                                             withMime:imageResult.mime
-                                                                             withSize:[NSNumber numberWithUnsignedInteger:imageResult.data.length]
-                                                                             withData:[[self.options objectForKey:@"includeBase64"] boolValue] ? [imageResult.data base64EncodedStringWithOptions:0]: nil
-                                                        ]];
-                             }
-                             processed++;
-                             [lock unlock];
-                             
-                             if (processed == [assets count]) {
-                                 
-                                 [indicatorView stopAnimating];
-                                 [overlayView removeFromSuperview];
-                                 [imagePickerController dismissViewControllerAnimated:YES completion:[self waitAnimationEnd:^{
-                                     self.resolve(selections);
-                                 }]];
-                                 return;
-                             }
-                         });
-                     }];
-                }
-            }
-        }];
-    } else {
-        PHAsset *phAsset = [assets objectAtIndex:0];
-        
-        [self showActivityIndicator:^(UIActivityIndicatorView *indicatorView, UIView *overlayView) {
-            if (phAsset.mediaType == PHAssetMediaTypeVideo) {
-                [self getVideoAsset:phAsset completion:^(NSDictionary* video) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [indicatorView stopAnimating];
-                        [overlayView removeFromSuperview];
-                        [imagePickerController dismissViewControllerAnimated:YES completion:[self waitAnimationEnd:^{
-                            if (video != nil) {
-                                self.resolve(video);
-                            } else {
-                                self.reject(ERROR_CANNOT_PROCESS_VIDEO_KEY, ERROR_CANNOT_PROCESS_VIDEO_MSG, nil);
-                            }
-                        }]];
-                    });
                 }];
             } else {
-                [manager
-                 requestImageDataForAsset:phAsset
-                 options:options
-                 resultHandler:^(NSData *imageData, NSString *dataUTI,
-                                 UIImageOrientation orientation,
-                                 NSDictionary *info) {
-                     NSURL *sourceURL = [info objectForKey:@"PHImageFileURLKey"];
-                     NSDictionary* exif;
-                     if([[self.options objectForKey:@"includeExif"] boolValue]) {
-                         exif = [[CIImage imageWithData:imageData] properties];
-                     }
-                     
-                     dispatch_async(dispatch_get_main_queue(), ^{
-                         [indicatorView stopAnimating];
-                         [overlayView removeFromSuperview];
-                         
-                         [self processSingleImagePick:[UIImage imageWithData:imageData]
-                                             withExif: exif
-                                   withViewController:imagePickerController
-                                        withSourceURL:[sourceURL absoluteString]
-                                  withLocalIdentifier:phAsset.localIdentifier
-                                         withFilename:[phAsset valueForKey:@"filename"]];
-                     });
-                 }];
+                [selectedPhotos addObject:[self handleCropImage:photos[idx] phAsset:asset compressQuality:compressQuality]];
+                if ([selectedPhotos count] == [assets count]) {
+                    completion(selectedPhotos);
+                }
             }
-        }];
-    }
+        }
+    }];
 }
 
-- (void)qb_imagePickerControllerDidCancel:(QBImagePickerController *)imagePickerController {
-    [imagePickerController dismissViewControllerAnimated:YES completion:[self waitAnimationEnd:^{
-        self.reject(ERROR_PICKER_CANCEL_KEY, ERROR_PICKER_CANCEL_MSG, nil);
-    }]];
-}
+/// 处理裁剪图片数据
+- (NSDictionary *)handleCropImage:(UIImage *)image phAsset:(PHAsset *)phAsset compressQuality:(CGFloat)compressQuality {
+    [self createDir];
 
-// when user selected single image, with camera or from photo gallery,
-// this method will take care of attaching image metadata, and sending image to cropping controller
-// or to user directly
-- (void) processSingleImagePick:(UIImage*)image withExif:(NSDictionary*) exif withViewController:(UIViewController*)viewController withSourceURL:(NSString*)sourceURL withLocalIdentifier:(NSString*)localIdentifier withFilename:(NSString*)filename {
-    
-    if (image == nil) {
-        [viewController dismissViewControllerAnimated:YES completion:[self waitAnimationEnd:^{
-            self.reject(ERROR_PICKER_NO_DATA_KEY, ERROR_PICKER_NO_DATA_MSG, nil);
-        }]];
-        return;
-    }
-    
-    NSLog(@"id: %@ filename: %@", localIdentifier, filename);
-    
-    if ([[[self options] objectForKey:@"cropping"] boolValue]) {
-        self.croppingFile = [[NSMutableDictionary alloc] init];
-        self.croppingFile[@"sourceURL"] = sourceURL;
-        self.croppingFile[@"localIdentifier"] = localIdentifier;
-        self.croppingFile[@"filename"] = filename;
-        NSLog(@"CroppingFile %@", self.croppingFile);
-        
-        [self startCropping:image];
+    NSMutableDictionary *photo  = [NSMutableDictionary dictionary];
+    NSString *filename = [NSString stringWithFormat:@"%@%@", [[NSUUID UUID] UUIDString], [phAsset valueForKey:@"filename"]];
+    NSString *fileExtension    = [filename pathExtension];
+    NSMutableString *filePath = [NSMutableString string];
+    BOOL isPNG = [fileExtension hasSuffix:@"PNG"] || [fileExtension hasSuffix:@"png"];
+
+    if (isPNG) {
+        [filePath appendString:[NSString stringWithFormat:@"%@ImageCropPicker/%@", NSTemporaryDirectory(), filename]];
     } else {
-        ImageResult *imageResult = [self.compression compressImage:image withOptions:self.options];
-        NSString *filePath = [self persistFile:imageResult.data];
-        if (filePath == nil) {
-            [viewController dismissViewControllerAnimated:YES completion:[self waitAnimationEnd:^{
-                self.reject(ERROR_CANNOT_SAVE_IMAGE_KEY, ERROR_CANNOT_SAVE_IMAGE_MSG, nil);
-            }]];
-            return;
-        }
-        
-        // Wait for viewController to dismiss before resolving, or we lose the ability to display
-        // Alert.alert in the .then() handler.
-        [viewController dismissViewControllerAnimated:YES completion:[self waitAnimationEnd:^{
-            self.resolve([self createAttachmentResponse:filePath
-                                               withExif:exif
-                                          withSourceURL:sourceURL
-                                    withLocalIdentifier:localIdentifier
-                                           withFilename:filename
-                                              withWidth:imageResult.width
-                                             withHeight:imageResult.height
-                                               withMime:imageResult.mime
-                                               withSize:[NSNumber numberWithUnsignedInteger:imageResult.data.length]
-                                               withData:[[self.options objectForKey:@"includeBase64"] boolValue] ? [imageResult.data base64EncodedStringWithOptions:0] : nil]);
-        }]];
+        [filePath appendString:[NSString stringWithFormat:@"%@ImageCropPicker/%@.jpg", NSTemporaryDirectory(), [filename stringByDeletingPathExtension]]];
+    }
+
+    NSData *writeData = isPNG ? UIImagePNGRepresentation(image) : UIImageJPEGRepresentation(image, compressQuality/100);
+    [writeData writeToFile:filePath atomically:YES];
+
+    photo[@"uri"]       = filePath;
+    photo[@"width"]     = @(image.size.width);
+    photo[@"height"]    = @(image.size.height);
+    NSInteger size = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil].fileSize;
+    photo[@"size"] = @(size);
+    photo[@"mediaType"] = @(phAsset.mediaType);
+    if ([self.cameraOptions sy_boolForKey:@"enableBase64"]) {
+        photo[@"base64"] = [NSString stringWithFormat:@"data:image/jpeg;base64,%@", [writeData base64EncodedStringWithOptions:0]];
+    }
+
+    return photo;
+}
+
+/// 处理原图数据
+- (NSDictionary *)handleOriginalPhotoData:(NSData *)data phAsset:(PHAsset *)phAsset isGIF:(BOOL)isGIF compressQuality:(CGFloat)compressQuality {
+    [self createDir];
+
+    NSMutableDictionary *photo  = [NSMutableDictionary dictionary];
+    NSString *filename = [NSString stringWithFormat:@"%@%@", [[NSUUID UUID] UUIDString], [phAsset valueForKey:@"filename"]];
+    NSString *fileExtension    = [filename pathExtension];
+    UIImage *image = nil;
+    NSData *writeData = nil;
+    NSMutableString *filePath = [NSMutableString string];
+
+    BOOL isPNG = [fileExtension hasSuffix:@"PNG"] || [fileExtension hasSuffix:@"png"];
+
+    if (isGIF) {
+        image = [UIImage sd_tz_animatedGIFWithData:data];
+        writeData = data;
+    } else {
+        image = [UIImage imageWithData: data];
+        writeData = isPNG ? UIImagePNGRepresentation(image) : UIImageJPEGRepresentation(image, compressQuality/100);
+    }
+
+    if (isPNG || isGIF) {
+        [filePath appendString:[NSString stringWithFormat:@"%@ImageCropPicker/%@", NSTemporaryDirectory(), filename]];
+    } else {
+        [filePath appendString:[NSString stringWithFormat:@"%@ImageCropPicker/%@.jpg", NSTemporaryDirectory(), [filename stringByDeletingPathExtension]]];
+    }
+
+    [writeData writeToFile:filePath atomically:YES];
+
+    photo[@"uri"]       = filePath;
+    photo[@"width"]     = @(image.size.width);
+    photo[@"height"]    = @(image.size.height);
+    NSInteger size      = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil].fileSize;
+    photo[@"size"]      = @(size);
+    photo[@"mediaType"] = @(phAsset.mediaType);
+    if ([self.cameraOptions sy_boolForKey:@"enableBase64"] && !isGIF) {
+        photo[@"base64"] = [NSString stringWithFormat:@"data:image/jpeg;base64,%@", [writeData base64EncodedStringWithOptions:0]];
+    }
+
+    return photo;
+}
+
+/// 处理视频数据
+- (NSDictionary *)handleVideoData:(NSString *)outputPath asset:(PHAsset *)asset coverImage:(UIImage *)coverImage compressQuality:(CGFloat)compressQuality {
+    NSMutableDictionary *video = [NSMutableDictionary dictionary];
+    video[@"uri"] = outputPath;
+    video[@"fileName"] = [asset valueForKey:@"filename"];
+    NSInteger size = [[NSFileManager defaultManager] attributesOfItemAtPath:outputPath error:nil].fileSize;
+    video[@"size"] = @(size);
+    video[@"duration"] = @(asset.duration);
+    video[@"width"] = @(asset.pixelWidth);
+    video[@"height"] = @(asset.pixelHeight);
+    video[@"type"] = @"video";
+    video[@"mime"] = @"video/mp4";
+    // iOS only
+    video[@"coverUri"] = [self handleCropImage:coverImage phAsset:asset compressQuality:compressQuality][@"uri"];
+    video[@"favorite"] = @(asset.favorite);
+    video[@"mediaType"] = @(asset.mediaType);
+
+    return video;
+}
+
+/// 创建SyanImageCaches缓存目录
+- (BOOL)createDir {
+    NSString * path = [NSString stringWithFormat:@"%@ImageCropPicker", NSTemporaryDirectory()];;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    BOOL isDir;
+    if  (![fileManager fileExistsAtPath:path isDirectory:&isDir]) {
+        //先判断目录是否存在，不存在才创建
+        BOOL res = [fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
+        return res;
+    } else return NO;
+}
+
+
+- (void)invokeSuccessWithResult:(NSArray *)photos {
+    if (self.callback) {
+        self.callback(@[[NSNull null], photos]);
+        self.callback = nil;
+    }
+    if (self.resolveBlock) {
+        self.resolveBlock(photos);
+        self.resolveBlock = nil;
     }
 }
 
-#pragma mark - CustomCropModeDelegates
-
-// Returns a custom rect for the mask.
-- (CGRect)imageCropViewControllerCustomMaskRect:
-(RSKImageCropViewController *)controller {
-    CGSize maskSize = CGSizeMake(
-                                 [[self.options objectForKey:@"width"] intValue],
-                                 [[self.options objectForKey:@"height"] intValue]);
-    
-    CGFloat viewWidth = CGRectGetWidth(controller.view.frame);
-    CGFloat viewHeight = CGRectGetHeight(controller.view.frame);
-    
-    CGRect maskRect = CGRectMake((viewWidth - maskSize.width) * 0.5f,
-                                 (viewHeight - maskSize.height) * 0.5f,
-                                 maskSize.width, maskSize.height);
-    
-    return maskRect;
-}
-
-// if provided width or height is bigger than screen w/h,
-// then we should scale draw area
-- (CGRect) scaleRect:(RSKImageCropViewController *)controller {
-    CGRect rect = controller.maskRect;
-    CGFloat viewWidth = CGRectGetWidth(controller.view.frame);
-    CGFloat viewHeight = CGRectGetHeight(controller.view.frame);
-    
-    double scaleFactor = fmin(viewWidth / rect.size.width, viewHeight / rect.size.height);
-    rect.size.width *= scaleFactor;
-    rect.size.height *= scaleFactor;
-    rect.origin.x = (viewWidth - rect.size.width) / 2;
-    rect.origin.y = (viewHeight - rect.size.height) / 2;
-    
-    return rect;
-}
-
-// Returns a custom path for the mask.
-- (UIBezierPath *)imageCropViewControllerCustomMaskPath:
-(RSKImageCropViewController *)controller {
-    CGRect rect = [self scaleRect:controller];
-    UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rect
-                                               byRoundingCorners:UIRectCornerAllCorners
-                                                     cornerRadii:CGSizeMake(0, 0)];
-    return path;
-}
-
-// Returns a custom rect in which the image can be moved.
-- (CGRect)imageCropViewControllerCustomMovementRect:
-(RSKImageCropViewController *)controller {
-    return [self scaleRect:controller];
-}
-
-#pragma mark - CropFinishDelegate
-
-// Crop image has been canceled.
-- (void)imageCropViewControllerDidCancelCrop:
-(RSKImageCropViewController *)controller {
-    [self dismissCropper:controller selectionDone:NO completion:[self waitAnimationEnd:^{
-        if (self.currentSelectionMode == CROPPING) {
-            self.reject(ERROR_PICKER_CANCEL_KEY, ERROR_PICKER_CANCEL_MSG, nil);
-        }
-    }]];
-}
-
-- (void) dismissCropper:(RSKImageCropViewController*)controller selectionDone:(BOOL)selectionDone completion:(void (^)())completion {
-    switch (self.currentSelectionMode) {
-        case CROPPING:
-            [controller dismissViewControllerAnimated:YES completion:completion];
-            break;
-        case PICKER:
-            if (selectionDone) {
-                [controller.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:completion];
-            } else {
-                // if user opened picker, tried to crop image, and cancelled cropping
-                // return him to the image selection instead of returning him to the app
-                [controller.presentingViewController dismissViewControllerAnimated:YES completion:completion];
-            }
-            break;
-        case CAMERA:
-            [controller.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:completion];
-            break;
+- (void)invokeError {
+    if (self.callback) {
+        self.callback(@[@"取消"]);
+        self.callback = nil;
+    }
+    if (self.rejectBlock) {
+        self.rejectBlock(@"", @"取消", nil);
+        self.rejectBlock = nil;
     }
 }
 
-// The original image has been cropped.
-- (void)imageCropViewController:(RSKImageCropViewController *)controller
-                   didCropImage:(UIImage *)croppedImage
-                  usingCropRect:(CGRect)cropRect {
-    
-    // we have correct rect, but not correct dimensions
-    // so resize image
-    CGSize resizedImageSize = CGSizeMake([[[self options] objectForKey:@"width"] intValue], [[[self options] objectForKey:@"height"] intValue]);
-    UIImage *resizedImage = [croppedImage resizedImageToFitInSize:resizedImageSize scaleIfSmaller:YES];
-    ImageResult *imageResult = [self.compression compressImage:resizedImage withOptions:self.options];
-    
-    NSString *filePath = [self persistFile:imageResult.data];
-    if (filePath == nil) {
-        [self dismissCropper:controller selectionDone:YES completion:[self waitAnimationEnd:^{
-            self.reject(ERROR_CANNOT_SAVE_IMAGE_KEY, ERROR_CANNOT_SAVE_IMAGE_MSG, nil);
-        }]];
-        return;
-    }
-    
-    NSDictionary* exif = nil;
-    if([[self.options objectForKey:@"includeExif"] boolValue]) {
-        exif = [[CIImage imageWithData:imageResult.data] properties];
-    }
-    
-    [self dismissCropper:controller selectionDone:YES completion:[self waitAnimationEnd:^{
-        self.resolve([self createAttachmentResponse:filePath
-                                           withExif: exif
-                                      withSourceURL: self.croppingFile[@"sourceURL"]
-                                withLocalIdentifier: self.croppingFile[@"localIdentifier"]
-                                       withFilename: self.croppingFile[@"filename"]
-                                          withWidth:imageResult.width
-                                         withHeight:imageResult.height
-                                           withMime:imageResult.mime
-                                           withSize:[NSNumber numberWithUnsignedInteger:imageResult.data.length]
-                                           withData:[[self.options objectForKey:@"includeBase64"] boolValue] ? [imageResult.data base64EncodedStringWithOptions:0] : nil]);
-    }]];
++ (BOOL)requiresMainQueueSetup
+{
+   return YES;
 }
 
-// at the moment it is not possible to upload image by reading PHAsset
-// we are saving image and saving it to the tmp location where we are allowed to access image later
-- (NSString*) persistFile:(NSData*)data {
-    // create temp file
-    NSString *tmpDirFullPath = [self getTmpDirectory];
-    NSString *filePath = [tmpDirFullPath stringByAppendingString:[[NSUUID UUID] UUIDString]];
-    filePath = [filePath stringByAppendingString:@".jpg"];
-    
-    // save cropped file
-    BOOL status = [data writeToFile:filePath atomically:YES];
-    if (!status) {
-        return nil;
-    }
-    
-    return filePath;
+- (UIViewController *)topViewController {
+    UIViewController *rootViewController = RCTPresentedViewController();
+    return rootViewController;
 }
 
-// The original image has been cropped. Additionally provides a rotation angle
-// used to produce image.
-- (void)imageCropViewController:(RSKImageCropViewController *)controller
-                   didCropImage:(UIImage *)croppedImage
-                  usingCropRect:(CGRect)cropRect
-                  rotationAngle:(CGFloat)rotationAngle {
-    [self imageCropViewController:controller didCropImage:croppedImage usingCropRect:cropRect];
+- (dispatch_queue_t)methodQueue {
+    return dispatch_get_main_queue();
 }
 
 @end
