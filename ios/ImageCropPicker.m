@@ -68,9 +68,7 @@ RCT_REMAP_METHOD(openCamera,
   [self takePhoto];
 }
 
-RCT_EXPORT_METHOD(clean,resolver:(RCTPromiseResolveBlock)resolve
-                                         rejecter:(RCTPromiseRejectBlock)reject) {
-    NSFileManager *fileManager = [NSFileManager defaultManager];
+RCT_EXPORT_METHOD(clean];
     [fileManager removeItemAtPath: [NSString stringWithFormat:@"%@ImageCropPicker", NSTemporaryDirectory()] error:nil];
 
      resolve(nil);
