@@ -112,7 +112,18 @@ RCT_REMAP_METHOD(clean,
     }else{
         maxSize = maxSize?maxSize:1;
     }
-
+    if(!CropW){
+       CropW = [self.cameraOptions sy_integerForKey:@"width"];
+    }
+    if(!CropW){
+         CropW = 300;
+    }
+    if(!CropH){
+       CropH = [self.cameraOptions sy_integerForKey:@"height"];
+    }
+    if(!CropH){
+         CropH = 300;
+    }
     TZImagePickerController *imagePickerVc = [[TZImagePickerController alloc] initWithMaxImagesCount:maxSize delegate:self];
 
     imagePickerVc.maxImagesCount = maxSize;
@@ -212,6 +223,18 @@ RCT_REMAP_METHOD(clean,
         maxSize = maxSize?maxSize:9;
     }else{
         maxSize = maxSize?maxSize:1;
+    }
+    if(!CropW){
+       CropW = [self.cameraOptions sy_integerForKey:@"width"];
+    }
+    if(!CropW){
+         CropW = 300;
+    }
+    if(!CropH){
+       CropH = [self.cameraOptions sy_integerForKey:@"height"];
+    }
+    if(!CropH){
+         CropH = 300;
     }
     TZImagePickerController *imagePickerVc = [[TZImagePickerController alloc] initWithMaxImagesCount:maxSize delegate:self];
 
