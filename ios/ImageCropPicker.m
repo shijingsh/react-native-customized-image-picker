@@ -187,6 +187,7 @@ RCT_REMAP_METHOD(clean,
     __weak TZImagePickerController *weakPickerVc = imagePickerVc;
     [imagePickerVc setImagePickerControllerDidCancelHandle:^{
         [weakPicker dismissViewControllerAnimated:YES completion:nil];
+        [self invokeError];
         [weakPickerVc hideProgressHUD];
     }];
 
@@ -567,10 +568,9 @@ RCT_REMAP_METHOD(clean,
 }
 
 - (void)invokeError {
-    if (self.resolveBlock) {
-        NSArray *arr1 = [NSArray array];
-        self.resolveBlock(arr1);
-        self.resolveBlock = nil;
+    if (self.rejectBlock) {
+        self.rejectBlock(@"cancel", @"cancel", nil);
+        self.rejectBlock = nil;
     }
 }
 

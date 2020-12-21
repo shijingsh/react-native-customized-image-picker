@@ -91,7 +91,7 @@ class PickerModule extends ReactContextBaseJavaModule {
         openCameraOnStart = options.hasKey("openCameraOnStart") && options.getBoolean("openCameraOnStart");
         width = options.hasKey("width") ? options.getInt("width") : width;
         height = options.hasKey("height") ? options.getInt("height") : height;
-        maxSize = options.hasKey("maxSize") ? options.getInt("maxSize") : maxSize;
+        maxSize = options.hasKey("maxSize") ? options.getInt("maxSize") : (multiple?9:1);
         cropping = options.hasKey("cropping") ? options.getBoolean("cropping") : cropping;
         includeBase64 = options.hasKey("includeBase64") && options.getBoolean("includeBase64");
         compressQuality = options.hasKey("compressQuality") ? options.getInt("compressQuality") : compressQuality;
@@ -321,7 +321,11 @@ class PickerModule extends ReactContextBaseJavaModule {
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
-                                        mPickerPromise.resolve(resultArr);
+                                        if(resultArr.size()==0){
+                                            mPickerPromise.reject("cancel","cancel");
+                                        }else{
+                                            mPickerPromise.resolve(resultArr);
+                                        }
                                     }
 
                                     @Override
@@ -340,7 +344,11 @@ class PickerModule extends ReactContextBaseJavaModule {
                                 WritableArray resultArr = new WritableNativeArray();
                                 if(result!=null)
                                 resultArr.pushMap(getAsyncSelection(activity,result));
-                                mPickerPromise.resolve(resultArr);
+                                if(resultArr.size()==0){
+                                    mPickerPromise.reject("cancel","cancel");
+                                }else{
+                                    mPickerPromise.resolve(resultArr);
+                                }
                             }
                         }
                     })
@@ -358,7 +366,11 @@ class PickerModule extends ReactContextBaseJavaModule {
                                 if(bean!=null)
                                 resultArr.pushMap(getAsyncSelection(activity,bean));
                             }
-                            mPickerPromise.resolve(resultArr);
+                            if(resultArr.size()==0){
+                                mPickerPromise.reject("cancel","cancel");
+                            }else{
+                                mPickerPromise.resolve(resultArr);
+                            }
                         }
 
                         @Override
@@ -449,7 +461,11 @@ class PickerModule extends ReactContextBaseJavaModule {
                                             } catch (Exception e) {
                                                 e.printStackTrace();
                                             }
-                                            mPickerPromise.resolve(resultArr);
+                                            if(resultArr.size()==0){
+                                                mPickerPromise.reject("cancel","cancel");
+                                            }else{
+                                                mPickerPromise.resolve(resultArr);
+                                            }
                                         }
 
                                         @Override
@@ -468,7 +484,11 @@ class PickerModule extends ReactContextBaseJavaModule {
                                     WritableArray resultArr = new WritableNativeArray();
                                     if(result!=null)
                                     resultArr.pushMap(getAsyncSelection(activity,result));
-                                    mPickerPromise.resolve(resultArr);
+                                    if(resultArr.size()==0){
+                                        mPickerPromise.reject("cancel","cancel");
+                                    }else{
+                                        mPickerPromise.resolve(resultArr);
+                                    }
                                 }
                             }
                         })
