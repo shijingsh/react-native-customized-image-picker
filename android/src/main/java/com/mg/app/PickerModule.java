@@ -316,6 +316,7 @@ class PickerModule extends ReactContextBaseJavaModule {
                                     public void cropAfter(Object t) {
                                         WritableArray resultArr = new WritableNativeArray();
                                         try {
+                                            if(t!=null)
                                             resultArr.pushMap(getAsyncSelection(activity,t.toString()));
                                         } catch (Exception e) {
                                             e.printStackTrace();
@@ -337,6 +338,7 @@ class PickerModule extends ReactContextBaseJavaModule {
                             if(!cropping){
                                 ImageCropBean result = imageRadioResultEvent.getResult();
                                 WritableArray resultArr = new WritableNativeArray();
+                                if(result!=null)
                                 resultArr.pushMap(getAsyncSelection(activity,result));
                                 mPickerPromise.resolve(resultArr);
                             }
@@ -353,6 +355,7 @@ class PickerModule extends ReactContextBaseJavaModule {
                             List<MediaBean> list = imageMultipleResultEvent.getResult();
                             WritableArray resultArr = new WritableNativeArray();
                             for(MediaBean bean:list){
+                                if(bean!=null)
                                 resultArr.pushMap(getAsyncSelection(activity,bean));
                             }
                             mPickerPromise.resolve(resultArr);
@@ -441,6 +444,7 @@ class PickerModule extends ReactContextBaseJavaModule {
                                         public void cropAfter(Object t) {
                                             WritableArray resultArr = new WritableNativeArray();
                                             try {
+                                                if(t!=null)
                                                 resultArr.pushMap(getAsyncSelection(activity,t.toString()));
                                             } catch (Exception e) {
                                                 e.printStackTrace();
@@ -462,6 +466,7 @@ class PickerModule extends ReactContextBaseJavaModule {
                                 if(!cropping){
                                     ImageCropBean result = imageRadioResultEvent.getResult();
                                     WritableArray resultArr = new WritableNativeArray();
+                                    if(result!=null)
                                     resultArr.pushMap(getAsyncSelection(activity,result));
                                     mPickerPromise.resolve(resultArr);
                                 }

@@ -567,10 +567,10 @@ RCT_REMAP_METHOD(clean,
 }
 
 - (void)invokeError {
-
-    if (self.rejectBlock) {
-        self.rejectBlock(@"", @"取消", nil);
-        self.rejectBlock = nil;
+    if (self.resolveBlock) {
+        NSArray *arr1 = [NSArray array];
+        self.resolveBlock(arr1);
+        self.resolveBlock = nil;
     }
 }
 
