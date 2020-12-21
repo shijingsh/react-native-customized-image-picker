@@ -161,10 +161,22 @@ auto linked
 
 - [TZImagePickerController](https://github.com/banchichen/TZImagePickerController) 
 
+### info.plist add the following to the file
+
+```
+	<key>NSCameraUsageDescription</key>
+	<string>1</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>1</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>1</string>
+```
 auto linked
 
 ```bash
-cd ios
+cd ios and run
 pod install
 ```
 
@@ -282,20 +294,6 @@ pod install
 - tools:replace="android:theme"
 - android:theme="@style/AppTheme"
 - cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity Theme_Light.Default
-
-## How it works?
-
-It is basically wrapper around few libraries
-
-#### Android
-
-- RxGalleryFinal: https://github.com/liukefu2050/RxGalleryFinal  
-   forked from https://github.com/FinalTeam/RxGalleryFinal
-
-#### iOS
-
-- QBImagePickerController
-- RSKImageCropper
 
 ## License
 
