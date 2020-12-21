@@ -19,10 +19,7 @@
  保存Promise的reject block
  */
 @property (nonatomic, copy) RCTPromiseRejectBlock rejectBlock;
-/**
- 保存回调的callback
- */
-@property (nonatomic, copy) RCTResponseSenderBlock callback;
+
 /**
  保存选中的图片数组
  */
@@ -53,7 +50,6 @@ RCT_REMAP_METHOD(openPicker,
 	self.cameraOptions = options;
     self.resolveBlock = resolve;
     self.rejectBlock = reject;
-    self.callback = nil;
 
     BOOL isVideo = [options sy_boolForKey:@"isVideo"] || NO;
     if(!isVideo){
@@ -72,7 +68,6 @@ RCT_REMAP_METHOD(openCamera,
   self.cameraOptions = options;
   self.resolveBlock = resolve;
   self.rejectBlock = reject;
-  self.callback = nil;
   [self takePhoto];
 }
 
@@ -165,7 +160,7 @@ RCT_REMAP_METHOD(clean,
     __weak TZImagePickerController *weakPicker = imagePickerVc;
     [imagePickerVc setDidFinishPickingPhotosWithInfosHandle:^(NSArray<UIImage *> *photos,NSArray *assets,BOOL isSelectOriginalPhoto,NSArray<NSDictionary *> *infos) {
         [self handleAssets:assets photos:photos compressQuality:compressQuality isSelectOriginalPhoto:isSelectOriginalPhoto completion:^(NSArray *selecteds) {
-            //callback(@[[NSNull null], selecteds]);
+
             [self invokeSuccessWithResult:selecteds];
             [weakPicker dismissViewControllerAnimated:YES completion:nil];
             [weakPicker hideProgressHUD];
@@ -179,13 +174,11 @@ RCT_REMAP_METHOD(clean,
         [weakPicker showProgressHUD];
         [[TZImageManager manager] getVideoOutputPathWithAsset:asset presetName:AVAssetExportPresetHighestQuality success:^(NSString *outputPath) {
             NSLog(@"视频导出成功:%@", outputPath);
-            //callback(@[[NSNull null], @[[self handleVideoData:outputPath asset:asset coverImage:coverImage compressQuality:compressQuality]]]);
              [self invokeSuccessWithResult:@[[self handleVideoData:outputPath asset:asset coverImage:coverImage compressQuality:compressQuality]]];
             [weakPicker dismissViewControllerAnimated:YES completion:nil];
             [weakPicker hideProgressHUD];
         } failure:^(NSString *errorMessage, NSError *error) {
             NSLog(@"视频导出失败:%@,error:%@",errorMessage, error);
-            //callback(@[@"视频导出失败"]);
             [weakPicker dismissViewControllerAnimated:YES completion:nil];
             [weakPicker hideProgressHUD];
         }];
@@ -193,7 +186,6 @@ RCT_REMAP_METHOD(clean,
 
     __weak TZImagePickerController *weakPickerVc = imagePickerVc;
     [imagePickerVc setImagePickerControllerDidCancelHandle:^{
-        //callback(@[@"取消"]);
         [weakPicker dismissViewControllerAnimated:YES completion:nil];
         [weakPickerVc hideProgressHUD];
     }];
@@ -568,10 +560,6 @@ RCT_REMAP_METHOD(clean,
 
 
 - (void)invokeSuccessWithResult:(NSArray *)photos {
-    if (self.callback) {
-        self.callback(@[[NSNull null], photos]);
-        self.callback = nil;
-    }
     if (self.resolveBlock) {
         self.resolveBlock(photos);
         self.resolveBlock = nil;
@@ -579,10 +567,7 @@ RCT_REMAP_METHOD(clean,
 }
 
 - (void)invokeError {
-    if (self.callback) {
-        self.callback(@[@"取消"]);
-        self.callback = nil;
-    }
+
     if (self.rejectBlock) {
         self.rejectBlock(@"", @"取消", nil);
         self.rejectBlock = nil;
