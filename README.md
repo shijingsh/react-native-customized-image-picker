@@ -152,11 +152,12 @@ yarn add react-native-customized-image-picker
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 ```
+
 ### iOS
 
 - [TZImagePickerController](https://github.com/banchichen/TZImagePickerController) 
 
-### info.plist add the following to the file
+#### info.plist add the following to the file
 
 ```
 	<key>NSCameraUsageDescription</key>
