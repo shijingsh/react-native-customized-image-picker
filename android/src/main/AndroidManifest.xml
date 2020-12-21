@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.mg.app">
 
-    <application>
+    <application android:requestLegacyExternalStorage="true">
 
         <activity android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"
                   android:screenOrientation="portrait"
