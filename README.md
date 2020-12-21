@@ -143,6 +143,8 @@ npm i react-native-customized-image-picker --save
 yarn add react-native-customized-image-picker
 ```
 
+#### android
+
 #### add permission <pickerExample>/android/app/src/main/AndroidManifest.xml
 
 ```xml
@@ -150,13 +152,6 @@ yarn add react-native-customized-image-picker
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 ```
-
-#### Post-install steps
-
-##### android
-
-auto linked
-
 ### iOS
 
 - [TZImagePickerController](https://github.com/banchichen/TZImagePickerController) 
@@ -175,8 +170,9 @@ auto linked
 ```
 auto linked
 
-```bash
+#### pod install 
 cd ios and run
+```bash
 pod install
 ```
 
