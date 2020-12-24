@@ -479,7 +479,7 @@ RCT_REMAP_METHOD(clean,
     photo[@"size"] = @(size);
     photo[@"mediaType"] = @(phAsset.mediaType);
     if ([self.cameraOptions sy_boolForKey:@"includeBase64"]) {
-        photo[@"data"] = [NSString stringWithFormat:@"data:image/jpeg;base64,%@", [writeData base64EncodedStringWithOptions:0]];
+        photo[@"data"] = [NSString stringWithFormat:@"%@", [writeData base64EncodedStringWithOptions:0]];
     }
 
     return photo;
