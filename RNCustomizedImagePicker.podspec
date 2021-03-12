@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.homepage        = "https://github.com/liukefu2050/react-native-customized-image-picker"
   s.license         = "MIT"
   s.author          = { "author" => "liukefu2050@sina.com" }
-  s.platform        = :ios, "9.0"
+  s.platform        = :ios, "10.0"
   s.source          = { :git => "https://github.com/liukefu2050/react-native-customized-image-picker.git", :tag => "master" }
   s.source_files    = "**/*.{h,m}"
   s.requires_arc    = true
