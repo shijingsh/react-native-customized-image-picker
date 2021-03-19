@@ -157,8 +157,12 @@ RCT_REMAP_METHOD(clean,
         }
     }
 
+
     __weak TZImagePickerController *weakPicker = imagePickerVc;
+    // Documentation source = through comments in TZImagePicker.
+    // If multiple videos are selected, this callback is called.
     [imagePickerVc setDidFinishPickingPhotosWithInfosHandle:^(NSArray<UIImage *> *photos,NSArray *assets,BOOL isSelectOriginalPhoto,NSArray<NSDictionary *> *infos) {
+        [weakPicker showProgressHUD];
         [self handleAssets:assets photos:photos compressQuality:compressQuality isSelectOriginalPhoto:isSelectOriginalPhoto completion:^(NSArray *selecteds) {
 
             [self invokeSuccessWithResult:selecteds];
@@ -170,8 +174,12 @@ RCT_REMAP_METHOD(clean,
         }];
     }];
 
+
+    // This callback is called only when picking SINGLE video.
     [imagePickerVc setDidFinishPickingVideoHandle:^(UIImage *coverImage, PHAsset *asset) {
         [weakPicker showProgressHUD];
+        // TODO: someshow change presetName based on provided compressQuality?
+        // Does it even matter here?
         [[TZImageManager manager] getVideoOutputPathWithAsset:asset presetName:AVAssetExportPresetHighestQuality success:^(NSString *outputPath) {
             NSLog(@"视频导出成功:%@", outputPath);
              [self invokeSuccessWithResult:@[[self handleVideoData:outputPath asset:asset coverImage:coverImage compressQuality:compressQuality]]];
@@ -184,11 +192,10 @@ RCT_REMAP_METHOD(clean,
         }];
     }];
 
-    __weak TZImagePickerController *weakPickerVc = imagePickerVc;
     [imagePickerVc setImagePickerControllerDidCancelHandle:^{
         [weakPicker dismissViewControllerAnimated:YES completion:nil];
         [self invokeError];
-        [weakPickerVc hideProgressHUD];
+        [weakPicker hideProgressHUD];
     }];
 
     [[self topViewController] presentViewController:imagePickerVc animated:YES completion:nil];
