@@ -3,12 +3,12 @@ apply plugin: 'com.android.library'
 def safeExtGet(prop, fallback) {
     rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
 }
-def _buildToolsVersion = safeExtGet("buildToolsVersion", "28.0.3")
-def _compileSdkVersion = safeExtGet("compileSdkVersion", 28)
+def _buildToolsVersion = safeExtGet("buildToolsVersion", "30.0.2")
+def _compileSdkVersion = safeExtGet("compileSdkVersion", 30)
 def _glideVersion = safeExtGet("glideVersion", "3.7.0")
 def _minSdkVersion = safeExtGet("minSdkVersion", 16)
 def _reactNativeVersion = safeExtGet("reactNativeVersion", "+")
-def _targetSdkVersion = safeExtGet("targetSdkVersion", 28)
+def _targetSdkVersion = safeExtGet("targetSdkVersion", 30)
 
 android {
     compileSdkVersion _compileSdkVersion
@@ -35,7 +35,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation "com.facebook.react:react-native:${_reactNativeVersion}"
 
-    implementation ('com.mg.RxCustomizedImagePicker:library:1.0.2'){
+    implementation ('com.mg.RxCustomizedImagePicker:library:1.0.3'){
         exclude module:'fileprovider'
     }
     //rxgalleryfinal依赖appcompat-v7和recyclerview-v7扩展卡库

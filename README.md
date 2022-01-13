@@ -149,8 +149,11 @@ yarn add react-native-customized-image-picker
 
 ```xml
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
 ```
 
 ### iOS
@@ -275,8 +278,9 @@ pod install
     android:label="@string/app_name"
     android:icon="@mipmap/ic_launcher"
     tools:replace="android:theme"
+    android:requestLegacyExternalStorage="true"
     android:theme="@style/AppTheme">
-
+      <meta-data android:name="ScopedStorage" android:value="true" />
       <activity
           android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"
           android:exported="true"
