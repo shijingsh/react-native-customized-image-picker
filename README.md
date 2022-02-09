@@ -30,6 +30,9 @@ iOS/Android image picker with support for camera, video compression, multiple im
   </a>
 </p>
 
+#### example
+
+https://github.com/shijingsh/pickExample
 
 #### Import library
 
